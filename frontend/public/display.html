@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display - MHC Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="4" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" /></filter></defs><rect width="1000" height="1000" fill="%23000"/><g opacity="0.1" filter="url(%23noise)"><circle cx="200" cy="200" r="300" fill="%23C7C7C7"/><circle cx="800" cy="300" r="250" fill="%23999"/><circle cx="400" cy="700" r="280" fill="%23666"/></g><g opacity="0.08"><path d="M0 0 Q250 200 500 0 T1000 0" stroke="%23C7C7C7" stroke-width="2" fill="none"/><path d="M0 300 Q250 500 500 300 T1000 300" stroke="%23999" stroke-width="1.5" fill="none"/><path d="M0 600 Q250 800 500 600 T1000 600" stroke="%23666" stroke-width="1" fill="none"/></g></svg>') fixed;
+            background-size: auto, 1000px 1000px;
+            color: var(--paradiso-white);
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(153, 153, 153, 0.3);
+            border-bottom: 1px solid var(--inferno-gray);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--paradiso-white);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        .cta-button {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        /* Hero/Featured Section */
+        .featured-section {
+            background: linear-gradient(135deg, var(--inferno-dark) 0%, #1a1a1a 100%);
+            padding: 4rem 2rem;
+            border-bottom: 3px solid var(--inferno-gray);
+        }
+
+        .featured-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .featured-text h1 {
+            font-size: 3rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 1rem;
+        }
+
+        .featured-text p {
+            font-size: 1.1rem;
+            color: var(--purgatorio-gray);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .featured-image {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            height: 300px;
+            border-radius: 8px;
+            border: 2px solid var(--inferno-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .featured-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            border: 2px solid var(--inferno-gray);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--paradiso-gold);
+            color: var(--paradiso-gold);
+        }
+
+        /* Trending Section */
+        .section {
+            padding: 3rem 2rem;
+            background: #0a0a0a;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .release-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .release-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .release-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--paradiso-gold);
+            box-shadow: 0 10px 30px rgba(153, 153, 153, 0.3);
+        }
+
+        .release-artwork {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border-bottom: 1px solid var(--inferno-gray);
+        }
+
+        .release-info {
+            padding: 1.5rem;
+        }
+
+        .release-title {
+            font-size: 1.2rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .release-artist {
+            color: var(--purgatorio-gray);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .release-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--inferno-gray);
+            margin-bottom: 1rem;
+        }
+
+        .release-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 1rem;
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            color: var(--paradiso-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: var(--inferno-gray);
+            font-size: 0.75rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--paradiso-gold);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: var(--purgatorio-gray);
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .footer-section a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        @media (max-width: 768px) {
+            .featured-content {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-text h1 {
+                font-size: 2rem;
+            }
+
+            .featured-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+
+            .release-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">MHC Streaming</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="gallery.html">Dante Gallery</a></li>
+            <li><a href="display.html">Display</a></li>
+            <li><a href="artist.html">Artist</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><button class="cta-button" onclick="window.location='login.html'">Login</button></li>
+        </ul>
+    </nav>
+
+    <!-- Featured Release -->
+    <section class="featured-section">
+        <div class="featured-content">
+            <div class="featured-text">
+                <h1>FEATURED RELEASE</h1>
+                <h2 style="color: var(--paradiso-gold); font-size: 1.5rem; margin-bottom: 1rem;">Echo of Eternity</h2>
+                <p>By Luna Eclipse</p>
+                <p>A breathtaking journey through the three realms of Dante's Divine Comedy. Luna Eclipse combines orchestral grandeur with modern electronic elements to create a sonic experience that transcends traditional genres.</p>
+                <div class="featured-buttons">
+                    <button class="btn-primary" onclick="window.location='player.html?track=echo-of-eternity'">Play Now</button>
+                    <button class="btn-secondary" onclick="window.location='favorites.html'">Add to Favorites</button>
+                </div>
+            </div>
+            <div class="featured-image" style="background: linear-gradient(135deg, #330000 0%, #000 100%); position: relative; overflow: hidden;"><svg viewBox="0 0 200 200" style="width:100%;height:100%;position:absolute;top:0;left:0"><defs><linearGradient id="featuredFlame" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23FFFF00;stop-opacity:1" /><stop offset="50%" style="stop-color:%23FF8800;stop-opacity:1" /><stop offset="100%" style="stop-color:%23FF0000;stop-opacity:0" /></linearGradient></defs><polygon points="100,30 130,120 70,120" fill="url(%23featuredFlame)"/><polygon points="100,50 120,130 80,130" fill="url(%23featuredFlame)" opacity="0.7"/><polygon points="100,70 110,140 90,140" fill="url(%23featuredFlame)" opacity="0.5"/></svg></div>
+        </div>
+    </section>
+
+    <!-- Trending Releases -->
+    <section class="section">
+        <h2 class="section-title">TRENDING NOW</h2>
+        <div class="release-grid">
+            <div class="release-card" onclick="window.location='player.html?track=descent-into-darkness'">
+                <div class="release-artwork"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;fill:currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                <div class="release-info">
+                    <div class="release-title">Descent into Darkness</div>
+                    <div class="release-artist">Luna Eclipse</div>
+                    <div class="release-meta">
+                        <span>Inferno</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">2.5K</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">840</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">320</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="release-card" onclick="window.location='player.html?track=climb-to-redemption'">
+                <div class="release-artwork"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;fill:none;stroke:currentColor;stroke-width:1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+                <div class="release-info">
+                    <div class="release-title">Climb to Redemption</div>
+                    <div class="release-artist">Rising Soul</div>
+                    <div class="release-meta">
+                        <span>Purgatorio</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">1.8K</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">620</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">240</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="release-card" onclick="window.location='player.html?track=divine-light'">
+                <div class="release-artwork"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;fill:currentColor"><polygon points="12 2 15.09 10.26 24 10.26 17.55 16.04 19.64 24 12 19.22 4.36 24 6.45 16.04 0 10.26 8.91 10.26"/></svg></div>
+                <div class="release-info">
+                    <div class="release-title">Divine Light</div>
+                    <div class="release-artist">Celestial Voices</div>
+                    <div class="release-meta">
+                        <span>Paradiso</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">3.2K</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">1.1K</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">560</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="release-card" onclick="window.location='player.html?track=tormented-beats'">
+                <div class="release-artwork"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;fill:currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                <div class="release-info">
+                    <div class="release-title">Tormented Beats</div>
+                    <div class="release-artist">The Void</div>
+                    <div class="release-meta">
+                        <span>Inferno</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">1.4K</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">480</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">180</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- New Releases -->
+    <section class="section" style="background: var(--inferno-dark);">
+        <h2 class="section-title">NEW RELEASES</h2>
+        <div class="release-grid">
+            <div class="release-card" onclick="window.location='player.html?track=angelic-choirs'">
+                <div class="release-artwork"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;fill:none;stroke:currentColor;stroke-width:1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M16 11h6"/><path d="M19 8v6"/></svg></div>
+                <div class="release-info">
+                    <div class="release-title">Angelic Choirs</div>
+                    <div class="release-artist">Heavenly Choir</div>
+                    <div class="release-meta">
+                        <span>Paradiso</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">890</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">320</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">95</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="release-card" onclick="window.location='player.html?track=growth-through-pain'">
+                <div class="release-artwork"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;fill:none;stroke:currentColor;stroke-width:1.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4l3-3 3 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/><line x1="12" y1="8" x2="12" y2="16"/></svg></div>
+                <div class="release-info">
+                    <div class="release-title">Growth Through Pain</div>
+                    <div class="release-artist">Green Spirit</div>
+                    <div class="release-meta">
+                        <span>Purgatorio</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">650</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">240</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">70</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="release-card" onclick="window.location='player.html?track=spectrum-of-joy'">
+                <div class="release-artwork">🌈</div>
+                <div class="release-info">
+                    <div class="release-title">The Spectrum of Joy</div>
+                    <div class="release-artist">Color Masters</div>
+                    <div class="release-meta">
+                        <span>Paradiso</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">720</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">290</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">130</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="release-card" onclick="window.location='player.html?track=infinity-beyond'">
+                <div class="release-artwork">♾️</div>
+                <div class="release-info">
+                    <div class="release-title">Infinity & Beyond</div>
+                    <div class="release-artist">Infinite Realm</div>
+                    <div class="release-meta">
+                        <span>Paradiso</span>
+                        <span>2024</span>
+                    </div>
+                    <div class="release-stats">
+                        <div class="stat">
+                            <div class="stat-number">540</div>
+                            <div class="stat-label">Streams</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">210</div>
+                            <div class="stat-label">Likes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">60</div>
+                            <div class="stat-label">Shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Discover</h4>
+                <a href="display.html">Display</a>
+                <a href="gallery.html">Gallery</a>
+                <a href="#">Charts</a>
+            </div>
+            <div class="footer-section">
+                <h4>Community</h4>
+                <a href="artist.html">Artists</a>
+                <a href="#">Playlists</a>
+                <a href="#">Events</a>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Contact</a>
+                <a href="#">Feedback</a>
+            </div>
+        </div>
+        <p>&copy; 2025 MHC Streaming Display. All rights reserved.</p>
+    </footer>
+</body>
+</html>

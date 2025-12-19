@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dante's Divine Comedy Gallery - Explore the complete artistic journey through Inferno, Purgatorio, and Paradiso. 36 curated images with full artwork metadata, artist information, and interactive features for music streaming.">
+    <meta name="keywords" content="Dante Divine Comedy, Inferno, Purgatorio, Paradiso, gallery, music visualization, art, streaming, canonical artwork">
+    <meta name="author" content="MHC Streaming">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta property="og:title" content="Dante's Divine Comedy Gallery - MHC Streaming">
+    <meta property="og:description" content="Journey through 36 authentic artworks inspired by Dante's three realms of the Divine Comedy. Inferno, Purgatorio, and Paradiso.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/Dantes_Divine_Comedy_Gallery/inferno/01_gate_of_hell.png">
+    <meta property="og:url" content="https://mhcstreaming.com/gallery.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dante's Divine Comedy Gallery - MHC Streaming">
+    <meta name="twitter:description" content="36 authentic artworks from Dante's three realms of the Divine Comedy">
+    <meta name="twitter:image" content="/Dantes_Divine_Comedy_Gallery/inferno/01_gate_of_hell.png">
+    <link rel="canonical" href="https://mhcstreaming.com/gallery.html">
+    <title>Dante's Divine Comedy Gallery - MHC Streaming | Artist-First Music Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a;
+            color: var(--paradiso-white);
+        }
+
+        nav {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(153, 153, 153, 0.3);
+            border-bottom: 1px solid var(--inferno-gray);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--paradiso-white);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        .cta-button {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--inferno-dark) 0%, #1a1a1a 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--inferno-gray);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--purgatorio-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .controls-section {
+            padding: 2rem;
+            background: #0a0a0a;
+            border-bottom: 1px solid var(--inferno-gray);
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn, .view-btn, .theme-btn {
+            padding: 0.8rem 1.5rem;
+            background: #1a1a1a;
+            color: var(--paradiso-white);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active,
+        .view-btn:hover, .view-btn.active,
+        .theme-btn:hover, .theme-btn.active {
+            background: var(--inferno-gray);
+            border-color: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        .search-box {
+            padding: 0.8rem 1.5rem;
+            background: #1a1a1a;
+            border: 2px solid var(--inferno-gray);
+            border-radius: 4px;
+            color: var(--paradiso-white);
+            width: 250px;
+            font-size: 0.9rem;
+        }
+
+        .search-box::placeholder {
+            color: var(--inferno-gray);
+        }
+
+        .gallery-container {
+            padding: 3rem 2rem;
+            background: var(--inferno-dark);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-grid.masonry {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        .gallery-grid.two-column {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gallery-grid.four-column {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .gallery-item {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-10px);
+            border-color: var(--paradiso-gold);
+            box-shadow: 0 10px 30px rgba(153, 153, 153, 0.3);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--inferno-gray);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover .gallery-image {
+            transform: scale(1.05);
+        }
+
+        .gallery-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+        }
+
+        .gallery-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .gallery-item:hover .gallery-image-overlay {
+            opacity: 1;
+        }
+
+        .gallery-info {
+            padding: 1.5rem;
+        }
+
+        .gallery-title {
+            font-size: 1.1rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .gallery-canto {
+            font-size: 0.85rem;
+            color: var(--inferno-gray);
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .gallery-description {
+            color: var(--purgatorio-gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--inferno-gray);
+            margin-bottom: 1rem;
+        }
+
+        .realm-badge {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 3px;
+            border-left: 3px solid var(--paradiso-gold);
+        }
+
+        .gallery-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.6rem 0.5rem;
+            background: #1a1a1a;
+            border: 1px solid var(--inferno-gray);
+            color: var(--paradiso-white);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            background: var(--inferno-gray);
+            border-color: var(--paradiso-gold);
+        }
+
+        .action-btn.favorited {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            border-color: var(--paradiso-gold);
+        }
+
+        .svg-icon {
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+        }
+
+        /* Lightbox Modal */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lightbox-image-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .lightbox-info {
+            background: rgba(26, 26, 26, 0.9);
+            padding: 1.5rem;
+            color: var(--paradiso-white);
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        .lightbox-title {
+            color: var(--paradiso-gold);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .lightbox-description {
+            color: var(--purgatorio-gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .lightbox-close:hover {
+            transform: scale(1.1);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .lightbox-nav button {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            border: none;
+            padding: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            pointer-events: auto;
+            transition: all 0.3s;
+        }
+
+        .lightbox-nav button:hover {
+            background: var(--purgatorio-gray);
+            color: var(--inferno-dark);
+        }
+
+        footer {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls-section {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .gallery-grid.two-column,
+            .gallery-grid.four-column {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .lightbox {
+                padding: 1rem;
+            }
+
+            .lightbox-nav button {
+                padding: 0.7rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">MHC Streaming</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="gallery.html">Dante Gallery</a></li>
+            <li><a href="display.html">Display</a></li>
+            <li><a href="artist.html">Artists</a></li>
+            <li><button class="cta-button" onclick="window.location='login.html'">Login</button></li>
+        </ul>
+    </nav>
+
+    <section class="page-header">
+        <h1>DANTE'S DIVINE COMEDY GALLERY</h1>
+        <p>Journey through all three realms—Inferno, Purgatorio, and Paradiso—with 36 authentic artworks</p>
+    </section>
+
+    <section class="controls-section">
+        <div class="control-group">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search by canto or title...">
+            <button class="filter-btn active" onclick="filterArtworks('all')">All Realms</button>
+            <button class="filter-btn" onclick="filterArtworks('inferno')">Inferno</button>
+            <button class="filter-btn" onclick="filterArtworks('purgatorio')">Purgatorio</button>
+            <button class="filter-btn" onclick="filterArtworks('paradiso')">Paradiso</button>
+        </div>
+        <div class="control-group">
+            <button class="view-btn active" onclick="changeView('grid')">Grid</button>
+            <button class="view-btn" onclick="changeView('masonry')">Masonry</button>
+            <button class="view-btn" onclick="changeView('two-column')">2-Col</button>
+            <button class="view-btn" onclick="changeView('four-column')">4-Col</button>
+        </div>
+        <div class="control-group">
+            <button class="theme-btn" onclick="showFavorites()">
+                <svg class="svg-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                Favorites
+            </button>
+            <button class="theme-btn" onclick="startSlideshow()">
+                <svg class="svg-icon" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Slideshow
+            </button>
+        </div>
+    </section>
+
+    <section class="gallery-container">
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()">×</button>
+            <div class="lightbox-image-wrapper">
+                <img class="lightbox-image" id="lightboxImage" src="" alt="">
+            </div>
+            <div class="lightbox-info">
+                <div class="lightbox-title" id="lightboxTitle"></div>
+                <div class="lightbox-description" id="lightboxDescription"></div>
+            </div>
+            <div class="lightbox-nav">
+                <button onclick="previousImage()">← Prev</button>
+                <button onclick="nextImage()">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 MHC Streaming Dante's Divine Comedy Gallery. Artist-first music platform.</p>
+    </footer>
+
+    <script>
+        const ARTWORKS = [
+            // INFERNO - 14 Cantos
+            { id: 1, realm: "inferno", canto: "I", title: "Gate of Hell", image: "/Dantes_Divine_Comedy_Gallery/inferno/01_gate_of_hell.png", description: "The gate of Hell carved with the words 'Abandon all hope, ye who enter here.' The threshold where Dante's descent into darkness begins." },
+            { id: 2, realm: "inferno", canto: "II", title: "Limbo", image: "/Dantes_Divine_Comedy_Gallery/inferno/02_limbo.png", description: "The first circle where virtuous pagans and unbaptized infants reside in eternal melancholy, separated from divine grace." },
+            { id: 3, realm: "inferno", canto: "V", title: "Lust", image: "/Dantes_Divine_Comedy_Gallery/inferno/03_lust.png", description: "Souls of the lustful carried endlessly by a violent storm, eternal punishment for carnal desire." },
+            { id: 4, realm: "inferno", canto: "VI", title: "Gluttony", image: "/Dantes_Divine_Comedy_Gallery/inferno/04_gluttony.png", description: "The gluttonous suffer in eternal rain and filth, guarded by Cerberus the three-headed dog." },
+            { id: 5, realm: "inferno", canto: "VII", title: "Greed", image: "/Dantes_Divine_Comedy_Gallery/inferno/05_greed.png", description: "The avaricious and prodigal push great weights in endless punishment for their excessive desire." },
+            { id: 6, realm: "inferno", canto: "VIII", title: "Wrath", image: "/Dantes_Divine_Comedy_Gallery/inferno/06_wrath.png", description: "The wrathful fight each other on the surface of Styx, while the sullen bubble beneath its waters." },
+            { id: 7, realm: "inferno", canto: "VIII-IX", title: "City of Dis", image: "/Dantes_Divine_Comedy_Gallery/inferno/07_city_of_dis.png", description: "The fortified city at the gates of lower Hell, with burning tombs housing heretics and schismatics." },
+            { id: 8, realm: "inferno", canto: "X", title: "Heresy", image: "/Dantes_Divine_Comedy_Gallery/inferno/08_heresy.png", description: "Heretics trapped in burning sepulchers, their fate tied eternally to the fires of Hell." },
+            { id: 9, realm: "inferno", canto: "XII", title: "Violence Against Others", image: "/Dantes_Divine_Comedy_Gallery/inferno/09_violence_others.png", description: "The violent boil in rivers of blood, shot by centaur archers in eternal torment." },
+            { id: 10, realm: "inferno", canto: "XIII", title: "Violence Against Self", image: "/Dantes_Divine_Comedy_Gallery/inferno/10_violence_self.png", description: "Suicides transformed into thorny trees, eternally consuming their own substance." },
+            { id: 11, realm: "inferno", canto: "XIV", title: "Violence Against God", image: "/Dantes_Divine_Comedy_Gallery/inferno/11_violence_god.png", description: "Blasphemers, sodomites, and usurers suffer eternal torment in deserts of burning sand." },
+            { id: 12, realm: "inferno", canto: "XVIII", title: "Fraud (Malebolge)", image: "/Dantes_Divine_Comedy_Gallery/inferno/12_fraud_malebolge.png", description: "Ten circles of fraud where deceivers are eternally punished in creative and fitting ways." },
+            { id: 13, realm: "inferno", canto: "XXXI-XXXII", title: "Treachery", image: "/Dantes_Divine_Comedy_Gallery/inferno/13_treachery.png", description: "Traitors frozen in ice at the lowest depths, their betrayals eternally punished by cold isolation." },
+            { id: 14, realm: "inferno", canto: "XXXIV", title: "Lucifer", image: "/Dantes_Divine_Comedy_Gallery/inferno/14_lucifer.png", description: "Lucifer frozen in ice at the center of Hell, wings beating eternally to create icy winds." },
+
+            // PURGATORIO - 10 Terraces
+            { id: 15, realm: "purgatorio", canto: "I", title: "The Shore", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/01_shore.png", description: "The shore of Purgatory where souls arrive to begin their ascent toward salvation and redemption." },
+            { id: 16, realm: "purgatorio", canto: "II-VIII", title: "The Gate", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/02_gate.png", description: "The gate of Purgatory, guarded by the angel with the keys of Saint Peter, entrance to purification." },
+            { id: 17, realm: "purgatorio", canto: "X", title: "Pride", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/03_pride.png", description: "The proud must carry heavy stones on their backs, learning humility through earthly burden." },
+            { id: 18, realm: "purgatorio", canto: "XIII", title: "Envy", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/04_envy.png", description: "The envious weep in blindness, learning to rejoice in others' good fortune." },
+            { id: 19, realm: "purgatorio", canto: "XV", title: "Wrath", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/05_wrath.png", description: "The wrathful walk in acrid smoke, learning peace and gentleness through suffering." },
+            { id: 20, realm: "purgatorio", canto: "XVII", title: "Sloth", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/06_sloth.png", description: "The slothful run ceaselessly in punishment for their spiritual laziness during life." },
+            { id: 21, realm: "purgatorio", canto: "XIX", title: "Avarice", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/07_avarice.png", description: "The avaricious lie prostrate, learning to value spiritual wealth over material possessions." },
+            { id: 22, realm: "purgatorio", canto: "XXIII", title: "Gluttony", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/08_gluttony.png", description: "The gluttonous starve amidst fruit they cannot reach, learning temperance and self-control." },
+            { id: 23, realm: "purgatorio", canto: "XXV", title: "Lust", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/09_lust.png", description: "The lustful walk through purifying flames, cleansing disordered desires through sacred fire." },
+            { id: 24, realm: "purgatorio", canto: "XXVIII-XXXIII", title: "Earthly Paradise", image: "/Dantes_Divine_Comedy_Gallery/purgatorio/10_earthly_paradise.png", description: "The earthly paradise at the summit of Purgatory, where Beatrice appears to guide Dante to Heaven." },
+
+            // PARADISO - 12 Spheres
+            { id: 25, realm: "paradiso", canto: "II", title: "Moon (Inconstant Vows)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/01_moon.png", description: "The sphere of the Moon where those who broke their vows dwell in gentle celestial light." },
+            { id: 26, realm: "paradiso", canto: "V", title: "Mercury (The Ambitious)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/02_mercury.png", description: "The sphere of Mercury, home to the ambitious who sought earthly glory rather than divine love." },
+            { id: 27, realm: "paradiso", canto: "VIII", title: "Venus (The Lovers)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/03_venus.png", description: "The sphere of Venus where lovers who united in carnal passion now experience divine joy." },
+            { id: 28, realm: "paradiso", canto: "X", title: "Sun (The Wise)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/04_sun.png", description: "The sphere of the Sun, seat of divine wisdom and understanding, ringed by great doctors of the Church." },
+            { id: 29, realm: "paradiso", canto: "XIV", title: "Mars (The Valiant)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/05_mars.png", description: "The sphere of Mars inhabited by warriors and martyrs who died for the faith." },
+            { id: 30, realm: "paradiso", canto: "XVIII", title: "Jupiter (The Just)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/06_jupiter.png", description: "The sphere of Jupiter, home to the just rulers who wielded power righteously." },
+            { id: 31, realm: "paradiso", canto: "XXI", title: "Saturn (The Contemplative)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/07_saturn.png", description: "The sphere of Saturn where monks and contemplatives ascended through monastic virtues." },
+            { id: 32, realm: "paradiso", canto: "XXII", title: "Fixed Stars (Faith, Hope, Love)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/08_fixed_stars.png", description: "The sphere of the Fixed Stars where the three theological virtues are examined by Christ." },
+            { id: 33, realm: "paradiso", canto: "XXVII", title: "Primum Mobile (Angels)", image: "/Dantes_Divine_Comedy_Gallery/paradiso/09_primum_mobile.png", description: "The Primum Mobile, the crystalline sphere moved by angelic love, encompassing all creation." },
+            { id: 34, realm: "paradiso", canto: "XXVIII", title: "Angelic Choirs", image: "/Dantes_Divine_Comedy_Gallery/paradiso/10_angelic_choirs.png", description: "The nine circles of angels arranged in hierarchical perfection around the divine throne." },
+            { id: 35, realm: "paradiso", canto: "XXXI", title: "The White Rose", image: "/Dantes_Divine_Comedy_Gallery/paradiso/11_white_rose.png", description: "The White Rose of Paradise where all the blessed are arranged in perfect celestial harmony." },
+            { id: 36, realm: "paradiso", canto: "XXXIII", title: "Vision of God", image: "/Dantes_Divine_Comedy_Gallery/paradiso/12_vision_of_god.png", description: "The ultimate vision of the Godhead, where Dante comprehends the mystery of divine love and creation." }
+        ];
+
+        let currentFilter = 'all';
+        let currentView = 'grid';
+        let favorites = JSON.parse(localStorage.getItem('galleryFavorites') || '[]');
+        let currentSlideshow = null;
+        let currentLightboxIndex = 0;
+        let filteredArtworks = ARTWORKS;
+
+        function renderGallery() {
+            const searchTerm = (document.getElementById('searchBox')?.value || '').toLowerCase();
+            filteredArtworks = ARTWORKS.filter(art => 
+                (currentFilter === 'all' || art.realm === currentFilter) &&
+                (art.title.toLowerCase().includes(searchTerm) ||
+                 art.description.toLowerCase().includes(searchTerm) ||
+                 art.canto.toLowerCase().includes(searchTerm))
+            );
+
+            const grid = document.getElementById('galleryGrid');
+            grid.className = `gallery-grid ${currentView}`;
+            grid.innerHTML = filteredArtworks.map(art => `
+                <div class="gallery-item" onclick="openLightbox(${art.id})">
+                    <div class="gallery-image">
+                        <img src="${art.image}" alt="${art.title} - Canto ${art.canto}" loading="lazy">
+                        <div class="gallery-image-overlay"></div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3 class="gallery-title">${art.title}</h3>
+                        <div class="gallery-canto">Canto ${art.canto}</div>
+                        <p class="gallery-description">${art.description}</p>
+                        <div class="gallery-meta">
+                            <span class="realm-badge">${art.realm.charAt(0).toUpperCase() + art.realm.slice(1)}</span>
+                        </div>
+                        <div class="gallery-actions">
+                            <button class="action-btn ${favorites.includes(art.id) ? 'favorited' : ''}" onclick="toggleFavorite(event, ${art.id})" title="Add to favorites">
+                                <svg class="svg-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                Save
+                            </button>
+                            <button class="action-btn" onclick="shareArtwork(event, '${art.title}')" title="Share artwork">
+                                <svg class="svg-icon" fill="currentColor" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="currentColor" stroke-width="2"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="currentColor" stroke-width="2"/></svg>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterArtworks(realm) {
+            currentFilter = realm;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderGallery();
+        }
+
+        function changeView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderGallery();
+        }
+
+        function toggleFavorite(e, id) {
+            e.stopPropagation();
+            const index = favorites.indexOf(id);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('galleryFavorites', JSON.stringify(favorites));
+            renderGallery();
+        }
+
+        function shareArtwork(e, title) {
+            e.stopPropagation();
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({ title: `Dante Gallery: ${title}`, url }).catch(err => console.log('Share failed', err));
+            } else {
+                alert(`Share "${title}"\n\n${url}`);
+            }
+        }
+
+        function openLightbox(id) {
+            const artIndex = filteredArtworks.findIndex(a => a.id === id);
+            if (artIndex > -1) {
+                currentLightboxIndex = artIndex;
+                updateLightbox();
+                document.getElementById('lightbox').classList.add('active');
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function updateLightbox() {
+            const art = filteredArtworks[currentLightboxIndex];
+            document.getElementById('lightboxImage').src = art.image;
+            document.getElementById('lightboxImage').alt = `${art.title} - Canto ${art.canto}`;
+            document.getElementById('lightboxTitle').textContent = `${art.title} - Canto ${art.canto}`;
+            document.getElementById('lightboxDescription').textContent = art.description;
+        }
+
+        function previousImage() {
+            currentLightboxIndex = (currentLightboxIndex - 1 + filteredArtworks.length) % filteredArtworks.length;
+            updateLightbox();
+        }
+
+        function nextImage() {
+            currentLightboxIndex = (currentLightboxIndex + 1) % filteredArtworks.length;
+            updateLightbox();
+        }
+
+        function startSlideshow() {
+            if (currentSlideshow) {
+                clearInterval(currentSlideshow);
+                currentSlideshow = null;
+                document.getElementById('lightbox').classList.remove('active');
+            } else {
+                if (filteredArtworks.length === 0) {
+                    alert('No artworks to display in slideshow.');
+                    return;
+                }
+                currentLightboxIndex = 0;
+                updateLightbox();
+                document.getElementById('lightbox').classList.add('active');
+                currentSlideshow = setInterval(nextImage, 4000);
+            }
+        }
+
+        function showFavorites() {
+            if (favorites.length === 0) {
+                alert('No favorites yet! Click the heart to save your favorite artworks.');
+                return;
+            }
+            currentFilter = 'all';
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.filter-btn')[0].classList.add('active');
+            
+            const grid = document.getElementById('galleryGrid');
+            const favorited = ARTWORKS.filter(art => favorites.includes(art.id));
+            filteredArtworks = favorited;
+            
+            grid.className = `gallery-grid ${currentView}`;
+            grid.innerHTML = favorited.map(art => `
+                <div class="gallery-item" onclick="openLightbox(${art.id})">
+                    <div class="gallery-image">
+                        <img src="${art.image}" alt="${art.title} - Canto ${art.canto}" loading="lazy">
+                        <div class="gallery-image-overlay"></div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3 class="gallery-title">${art.title}</h3>
+                        <div class="gallery-canto">Canto ${art.canto}</div>
+                        <p class="gallery-description">${art.description}</p>
+                        <div class="gallery-meta">
+                            <span class="realm-badge">${art.realm.charAt(0).toUpperCase() + art.realm.slice(1)}</span>
+                        </div>
+                        <div class="gallery-actions">
+                            <button class="action-btn favorited" onclick="toggleFavorite(event, ${art.id})" title="Remove from favorites">
+                                <svg class="svg-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                Save
+                            </button>
+                            <button class="action-btn" onclick="shareArtwork(event, '${art.title}')" title="Share artwork">
+                                <svg class="svg-icon" fill="currentColor" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="currentColor" stroke-width="2"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="currentColor" stroke-width="2"/></svg>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('searchBox').addEventListener('input', renderGallery);
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lightbox').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') previousImage();
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+
+        renderGallery();
+    </script>
+</body>
+</html>

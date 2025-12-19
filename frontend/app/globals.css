@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', system-ui, sans-serif;
+    --font-cinzel: 'Cinzel', Georgia, serif;
+  }
+  
+  body {
+    @apply font-ui;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  /* Realm-specific button styles */
+  .btn-inferno {
+    @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200 shadow-inferno;
+  }
+  
+  .btn-purgatorio {
+    @apply bg-purgatorio-medium hover:bg-purgatorio-dark text-white font-bold py-2 px-6 rounded-lg transition-all duration-200;
+  }
+  
+  .btn-paradiso {
+    @apply bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-6 rounded-lg transition-all duration-200;
+  }
+  
+  /* Card styles */
+  .card-inferno {
+    @apply bg-inferno-charcoal border border-inferno-border rounded-lg p-6 shadow-inferno;
+  }
+  
+  .card-purgatorio {
+    @apply bg-purgatorio-dark border border-purgatorio-medium rounded-lg p-6;
+  }
+  
+  .card-paradiso {
+    @apply bg-paradiso-pearl border border-paradiso-silver rounded-lg p-6;
+  }
+  
+  /* Input styles */
+  .input-base {
+    @apply w-full px-4 py-2 rounded-lg border bg-black/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all;
+  }
+  
+  .input-inferno {
+    @apply input-base border-inferno-border focus:ring-red-600;
+  }
+  
+  .input-purgatorio {
+    @apply input-base border-purgatorio-medium focus:ring-purgatorio-mist;
+  }
+  
+  .input-paradiso {
+    @apply input-base border-paradiso-silver focus:ring-yellow-500;
+  }
+}
+
+@layer utilities {
+  .animate-flicker {
+    animation: flicker 3s ease-in-out infinite;
+  }
+  
+  .animate-ascend {
+    animation: ascend 20s linear infinite;
+  }
+  
+  .animate-orbit {
+    animation: orbit 30s linear infinite;
+  }
+  
+  .text-shadow-inferno {
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  }
+  
+  .text-shadow-paradiso {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+}

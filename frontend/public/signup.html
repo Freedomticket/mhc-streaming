@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <title>Sign Up - MHC Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="4" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" /></filter></defs><rect width="1000" height="1000" fill="%23000"/><g opacity="0.1" filter="url(%23noise)"><circle cx="200" cy="200" r="300" fill="%23C7C7C7"/><circle cx="800" cy="300" r="250" fill="%23999"/><circle cx="400" cy="700" r="280" fill="%23666"/></g><g opacity="0.08"><path d="M0 0 Q250 200 500 0 T1000 0" stroke="%23C7C7C7" stroke-width="2" fill="none"/><path d="M0 300 Q250 500 500 300 T1000 300" stroke="%23999" stroke-width="1.5" fill="none"/><path d="M0 600 Q250 800 500 600 T1000 600" stroke="%23666" stroke-width="1" fill="none"/></g></svg>') fixed;
+            background-size: auto, 1000px 1000px;
+            color: var(--paradiso-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .signup-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .signup-header h1 {
+            font-size: 2rem;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-header p {
+            color: var(--purgatorio-gray);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--paradiso-gold);
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0a0a0a;
+            border: 2px solid var(--inferno-gray);
+            color: var(--paradiso-white);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--paradiso-gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .signup-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .signup-button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .signup-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        .signup-footer p {
+            color: var(--purgatorio-gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-footer a {
+            color: var(--paradiso-gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .signup-footer a:hover {
+            color: var(--paradiso-white);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--purgatorio-gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--paradiso-gold);
+        }
+
+        @media (max-width: 600px) {
+            .signup-container {
+                padding: 2rem;
+            }
+
+            .signup-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>MHC STREAMING</h1>
+            <p>Create Your Artist Account</p>
+        </div>
+
+        <form onsubmit="handleSignup(event)">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Choose your username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm">Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" placeholder="Confirm your password" required>
+            </div>
+
+            <button type="submit" class="signup-button">Create Account</button>
+        </form>
+
+        <div class="signup-footer">
+            <p>Already have an account? <a href="login.html">Sign in here</a></p>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        function handleSignup(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm').value;
+            const username = document.getElementById('username').value.trim();
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Validate username (alphanumeric, 3-20 chars)
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+                alert('Username must be 3-20 characters (alphanumeric and underscore only)');
+                return;
+            }
+            
+            // Validate passwords match
+            if (password !== confirm) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long!');
+                return;
+            }
+            
+            // Validate password contains uppercase, lowercase, and number
+            if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+                alert('Password must contain uppercase, lowercase, and numbers');
+                return;
+            }
+
+            alert('Welcome! Your account has been created successfully!');
+            // Clear sensitive data
+            document.getElementById('password').value = '';
+            document.getElementById('confirm').value = '';
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

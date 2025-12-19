@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist - MHC Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="4" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" /></filter></defs><rect width="1000" height="1000" fill="%23000"/><g opacity="0.1" filter="url(%23noise)"><circle cx="200" cy="200" r="300" fill="%23C7C7C7"/><circle cx="800" cy="300" r="250" fill="%23999"/><circle cx="400" cy="700" r="280" fill="%23666"/></g><g opacity="0.08"><path d="M0 0 Q250 200 500 0 T1000 0" stroke="%23C7C7C7" stroke-width="2" fill="none"/><path d="M0 300 Q250 500 500 300 T1000 300" stroke="%23999" stroke-width="1.5" fill="none"/><path d="M0 600 Q250 800 500 600 T1000 600" stroke="%23666" stroke-width="1" fill="none"/></g></svg>') fixed;
+            background-size: auto, 1000px 1000px;
+            color: var(--paradiso-white);
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(153, 153, 153, 0.3);
+            border-bottom: 1px solid var(--inferno-gray);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--paradiso-white);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        .cta-button {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--inferno-dark) 0%, #1a1a1a 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--inferno-gray);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--purgatorio-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--inferno-gray);
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--purgatorio-gray);
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover,
+        .tab-btn.active {
+            color: var(--paradiso-gold);
+            border-bottom-color: var(--paradiso-gold);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Artist Grid */
+        .artist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .artist-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .artist-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--paradiso-gold);
+            box-shadow: 0 10px 30px rgba(153, 153, 153, 0.3);
+        }
+
+        .artist-avatar {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            border-bottom: 1px solid var(--inferno-gray);
+        }
+
+        .artist-info {
+            padding: 2rem;
+        }
+
+        .artist-name {
+            font-size: 1.3rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .artist-title {
+            color: var(--purgatorio-gray);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .artist-realm {
+            display: inline-block;
+            background: var(--inferno-gray);
+            color: var(--inferno-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .artist-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-top: 1px solid var(--inferno-gray);
+            border-bottom: 1px solid var(--inferno-gray);
+            margin-bottom: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            color: var(--paradiso-gold);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .stat-label {
+            color: var(--inferno-gray);
+            font-size: 0.8rem;
+        }
+
+        .artist-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-follow {
+            flex: 1;
+            padding: 0.8rem;
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-follow:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        .btn-follow.following {
+            background: transparent;
+            border: 2px solid var(--inferno-gray);
+        }
+
+        .btn-message {
+            flex: 1;
+            padding: 0.8rem;
+            background: transparent;
+            color: var(--paradiso-white);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-message:hover {
+            border-color: var(--paradiso-gold);
+            color: var(--paradiso-gold);
+        }
+
+        /* Featured Artist */
+        .featured-artist {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .featured-avatar {
+            font-size: 6rem;
+            text-align: center;
+        }
+
+        .featured-details h2 {
+            font-size: 2rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .featured-details p {
+            color: var(--purgatorio-gray);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .featured-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            padding: 1rem 2rem;
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--paradiso-gold);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: var(--purgatorio-gray);
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .footer-section a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        @media (max-width: 768px) {
+            .featured-artist {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-details h2 {
+                font-size: 1.5rem;
+            }
+
+            .featured-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+
+            .artist-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                border-bottom: 2px solid var(--inferno-gray);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">MHC Streaming</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="gallery.html">Dante Gallery</a></li>
+            <li><a href="display.html">Display</a></li>
+            <li><a href="artist.html">Artist</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><button class="cta-button" onclick="window.location='login.html'">Login</button></li>
+        </ul>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>ARTISTS</h1>
+        <p>Discover talented musicians and creators from around the world</p>
+    </section>
+
+    <!-- Main Content -->
+    <section class="container">
+        <!-- Featured Artist -->
+        <div class="featured-artist">
+            <div class="featured-avatar">
+                <svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23FFD700;stroke-width:2"><circle cx="100" cy="100" r="80" /><path d="M100 40 Q140 60 140 100 Q140 150 100 160 Q60 150 60 100 Q60 60 100 40" /></svg>
+            </div>
+            <div class="featured-details">
+                <h2>Luna Eclipse</h2>
+                <p style="color: var(--paradiso-gold); font-weight: bold;">Featured Artist - ISM</p>
+                <p>Luna Eclipse is a visionary composer who blends classical orchestration with modern electronic sounds. Her groundbreaking "Echo of Eternity" album has captured audiences worldwide with its journey through Dante's Divine Comedy.</p>
+                <p><strong>Followers:</strong> 15.2K | <strong>Streams:</strong> 2.4M | <strong>Releases:</strong> 8</p>
+                <div class="featured-buttons">
+                    <button class="btn-primary" onclick="toggleFollow2(event)">Follow</button>
+                    <button class="btn-primary" onclick="window.location='messages.html?artist=luna-eclipse'">Message</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('all')">All Artists</button>
+            <button class="tab-btn" onclick="switchTab('inferno')">Inferno Realm</button>
+            <button class="tab-btn" onclick="switchTab('purgatorio')">Purgatorio Realm</button>
+            <button class="tab-btn" onclick="switchTab('paradiso')">Paradiso Realm</button>
+        </div>
+
+        <!-- All Artists Tab -->
+        <div id="all" class="tab-content active">
+            <div class="artist-grid">
+                <div class="artist-card" onclick="viewProfile('luna-eclipse')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23FFD700;stroke-width:2"><circle cx="100" cy="100" r="70" /><path d="M140 100 Q130 70 100 70 Q100 130 140 100" fill="%23FFD700" opacity="0.3"/></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Luna Eclipse</div>
+                        <div class="artist-title">Composer & Producer</div>
+                        <span class="artist-realm">Inferno</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">15.2K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">2.4M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=luna-eclipse'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('rising-soul')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23FFD700;stroke-width:2"><circle cx="100" cy="150" r="35" opacity="0.6" /><line x1="60" y1="130" x2="140" y2="130" stroke="%23FFD700" stroke-width="1.5"/><line x1="50" y1="110" x2="150" y2="110" stroke="%23FFD700" stroke-width="1"/></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Rising Soul</div>
+                        <div class="artist-title">Singer-Songwriter</div>
+                        <span class="artist-realm">Purgatorio</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">9.8K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">1.1M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=rising-soul'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('celestial-voices')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:%23FFD700;opacity:0.7"><polygon points="100,40 115,85 165,85 128,130 145,175 100,140 55,175 72,130 35,85 85,85" /><polygon points="60,60 68,80 85,80 72,92 80,112 65,100 50,112 58,92 45,80 62,80" /><polygon points="140,60 148,80 165,80 152,92 160,112 145,100 130,112 138,92 125,80 142,80" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Celestial Voices</div>
+                        <div class="artist-title">Vocal Ensemble</div>
+                        <span class="artist-realm">Paradiso</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">12.5K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">3.2M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=celestial-voices'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('the-void')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:%23999"><polygon points="100,20 130,80 90,80 120,160 60,100 100,100" /><polygon points="100,40 115,80 95,80 110,140 75,100 100,100" fill="%23FFD700" opacity="0.5" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">The Void</div>
+                        <div class="artist-title">Electronic Artist</div>
+                        <span class="artist-realm">Inferno</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">8.3K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">850K</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=the-void'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('green-spirit')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23666;stroke-width:1.5"><line x1="100" y1="160" x2="100" y2="80" /><path d="M100 100 Q80 90 70 70" /><path d="M100 100 Q120 90 130 70" /><path d="M100 120 Q85 115 75 105" /><path d="M100 120 Q115 115 125 105" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Green Spirit</div>
+                        <div class="artist-title">Folk Musician</div>
+                        <span class="artist-realm">Purgatorio</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">6.7K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">650K</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=green-spirit'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('color-masters')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke-width:3"><path d="M50 150 Q100 50 150 150" stroke="%23FF4444" /><path d="M60 150 Q100 70 140 150" stroke="%23FFD700" /><path d="M70 150 Q100 90 130 150" stroke="%23C7C7C7" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Color Masters</div>
+                        <div class="artist-title">DJ & Producer</div>
+                        <span class="artist-realm">Paradiso</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">11.2K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">2.1M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=color-masters'">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inferno Realm Tab -->
+        <div id="inferno" class="tab-content">
+            <div class="artist-grid">
+                <div class="artist-card" onclick="viewProfile('luna-eclipse')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23FFD700;stroke-width:2"><circle cx="100" cy="100" r="70" /><path d="M140 100 Q130 70 100 70 Q100 130 140 100" fill="%23FFD700" opacity="0.3"/></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Luna Eclipse</div>
+                        <div class="artist-title">Composer & Producer</div>
+                        <span class="artist-realm">Inferno</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">15.2K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">2.4M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=luna-eclipse'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('the-void')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:%23999"><polygon points="100,20 130,80 90,80 120,160 60,100 100,100" /><polygon points="100,40 115,80 95,80 110,140 75,100 100,100" fill="%23FFD700" opacity="0.5" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">The Void</div>
+                        <div class="artist-title">Electronic Artist</div>
+                        <span class="artist-realm">Inferno</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">8.3K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">850K</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=the-void'">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purgatorio Realm Tab -->
+        <div id="purgatorio" class="tab-content">
+            <div class="artist-grid">
+                <div class="artist-card" onclick="viewProfile('rising-soul')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23FFD700;stroke-width:2"><circle cx="100" cy="150" r="35" opacity="0.6" /><line x1="60" y1="130" x2="140" y2="130" stroke="%23FFD700" stroke-width="1.5"/><line x1="50" y1="110" x2="150" y2="110" stroke="%23FFD700" stroke-width="1"/></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Rising Soul</div>
+                        <div class="artist-title">Singer-Songwriter</div>
+                        <span class="artist-realm">Purgatorio</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">9.8K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">1.1M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=rising-soul'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('green-spirit')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke:%23666;stroke-width:1.5"><line x1="100" y1="160" x2="100" y2="80" /><path d="M100 100 Q80 90 70 70" /><path d="M100 100 Q120 90 130 70" /><path d="M100 120 Q85 115 75 105" /><path d="M100 120 Q115 115 125 105" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Green Spirit</div>
+                        <div class="artist-title">Folk Musician</div>
+                        <span class="artist-realm">Purgatorio</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">6.7K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">650K</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=green-spirit'">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paradiso Realm Tab -->
+        <div id="paradiso" class="tab-content">
+            <div class="artist-grid">
+                <div class="artist-card" onclick="viewProfile('celestial-voices')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:%23FFD700;opacity:0.7"><polygon points="100,40 115,85 165,85 128,130 145,175 100,140 55,175 72,130 35,85 85,85" /><polygon points="60,60 68,80 85,80 72,92 80,112 65,100 50,112 58,92 45,80 62,80" /><polygon points="140,60 148,80 165,80 152,92 160,112 145,100 130,112 138,92 125,80 142,80" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Celestial Voices</div>
+                        <div class="artist-title">Vocal Ensemble</div>
+                        <span class="artist-realm">Paradiso</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">12.5K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">3.2M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=celestial-voices'">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-card" onclick="viewProfile('color-masters')">
+                    <div class="artist-avatar"><svg viewBox="0 0 200 200" style="width:100%;height:100%;fill:none;stroke-width:3"><path d="M50 150 Q100 50 150 150" stroke="%23FF4444" /><path d="M60 150 Q100 70 140 150" stroke="%23FFD700" /><path d="M70 150 Q100 90 130 150" stroke="%23C7C7C7" /></svg></div>
+                    <div class="artist-info">
+                        <div class="artist-name">Color Masters</div>
+                        <div class="artist-title">DJ & Producer</div>
+                        <span class="artist-realm">Paradiso</span>
+                        <div class="artist-stats">
+                            <div class="stat">
+                                <div class="stat-number">11.2K</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">2.1M</div>
+                                <div class="stat-label">Streams</div>
+                            </div>
+                        </div>
+                        <div class="artist-buttons">
+                            <button class="btn-follow" onclick="toggleFollow(event)">Follow</button>
+                            <button class="btn-message" onclick="window.location='messages.html?artist=color-masters'">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Artists</h4>
+                <a href="artist.html">Browse Artists</a>
+                <a href="#">Submit Music</a>
+                <a href="#">Artist Tools</a>
+            </div>
+            <div class="footer-section">
+                <h4>Community</h4>
+                <a href="#">Events</a>
+                <a href="#">Collaborations</a>
+                <a href="#">Forum</a>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Contact</a>
+                <a href="#">Feedback</a>
+            </div>
+        </div>
+        <p>&copy; 2025 MHC Streaming Artists. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function switchTab(tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            contents.forEach(content => content.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleFollow(event) {
+            event.stopPropagation();
+            const btn = event.target;
+            if (btn.classList.contains('following')) {
+                btn.classList.remove('following');
+                btn.textContent = 'Follow';
+            } else {
+                btn.classList.add('following');
+                btn.textContent = 'Following';
+            }
+        }
+
+        function toggleFollow2(event) {
+            const btn = event.target;
+            if (btn.classList.contains('following')) {
+                btn.classList.remove('following');
+                btn.textContent = 'Follow';
+            } else {
+                btn.classList.add('following');
+                btn.textContent = 'Following';
+            }
+        }
+
+        function viewProfile(artistId) {
+            window.location = 'profile.html?artist=' + artistId;
+        }
+    </script>
+</body>
+</html>

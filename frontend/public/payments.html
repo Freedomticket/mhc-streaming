@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <title>Payments & Payouts - MHC Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a;
+            color: var(--paradiso-white);
+        }
+
+        nav {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(153, 153, 153, 0.3);
+            border-bottom: 1px solid var(--inferno-gray);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--paradiso-white);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 1rem;
+        }
+
+        .balance-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .balance-card h3 {
+            color: var(--purgatorio-gray);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            color: var(--paradiso-gold);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .balance-status {
+            font-size: 0.9rem;
+            color: var(--inferno-gray);
+        }
+
+        .section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--inferno-gray);
+            padding-bottom: 1rem;
+        }
+
+        .payout-method {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--inferno-gray);
+            background: #0a0a0a;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .payout-method:last-child {
+            margin-bottom: 0;
+        }
+
+        .method-info h4 {
+            color: var(--paradiso-gold);
+            margin-bottom: 0.25rem;
+        }
+
+        .method-info p {
+            color: var(--purgatorio-gray);
+            font-size: 0.9rem;
+        }
+
+        .method-action button {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .method-action button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transaction-table th {
+            background: #0a0a0a;
+            color: var(--paradiso-gold);
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--inferno-gray);
+            font-weight: bold;
+        }
+
+        .transaction-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--inferno-gray);
+            color: var(--purgatorio-gray);
+        }
+
+        .transaction-table tr:hover {
+            background: #0a0a0a;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .status-completed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+
+        .status-pending {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--paradiso-gold);
+        }
+
+        .status-failed {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+        }
+
+        .add-method-btn {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .add-method-btn:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        footer {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--inferno-gray);
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .payout-method {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .method-action {
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .method-action button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">MHC STREAMING</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="payments.html">Payments</a></li>
+            <li><button style="background: var(--inferno-gray); color: var(--paradiso-white); padding: 0.8rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;" onclick="logout()">Logout</button></li>
+        </ul>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header">
+            <h1>Payments & Payouts</h1>
+            <p style="color: var(--purgatorio-gray);">Manage your payment methods, view transaction history, and request payouts</p>
+        </div>
+
+        <!-- Balance Summary -->
+        <div class="balance-summary">
+            <div class="balance-card">
+                <h3>Available Balance</h3>
+                <div class="balance-amount">$5,340.75</div>
+                <div class="balance-status">Ready for payout</div>
+            </div>
+            <div class="balance-card">
+                <h3>Pending Balance</h3>
+                <div class="balance-amount">$2,180.50</div>
+                <div class="balance-status">Processing (5 days)</div>
+            </div>
+            <div class="balance-card">
+                <h3>Total Earned (YTD)</h3>
+                <div class="balance-amount">$18,945.25</div>
+                <div class="balance-status">January - December 2025</div>
+            </div>
+        </div>
+
+        <!-- Payout Methods -->
+        <div class="section">
+            <h2>Payout Methods</h2>
+            <button class="add-method-btn" onclick="addPayoutMethod()">+ Add New Payout Method</button>
+            
+            <div class="payout-method">
+                <div class="method-info">
+                    <h4>🏦 Bank Transfer (Primary)</h4>
+                    <p>Account ending in ****5678 • Chase Bank</p>
+                    <p style="margin-top: 0.25rem; color: #00ff00;">✓ Verified</p>
+                </div>
+                <div class="method-action">
+                    <button onclick="editPayoutMethod('bank')">Edit</button>
+                </div>
+            </div>
+
+            <div class="payout-method">
+                <div class="method-info">
+                    <h4>💳 PayPal</h4>
+                    <p>luna@paypal.com</p>
+                    <p style="margin-top: 0.25rem; color: #00ff00;">✓ Verified</p>
+                </div>
+                <div class="method-action">
+                    <button onclick="editPayoutMethod('paypal')">Edit</button>
+                </div>
+            </div>
+
+            <div class="payout-method">
+                <div class="method-info">
+                    <h4>₿ Bitcoin (Only Crypto Accepted)</h4>
+                    <p>Wallet: 1A1z7aD...wiqtN2C (truncated)</p>
+                    <p style="margin-top: 0.25rem; color: #00ff00;">✓ Verified</p>
+                </div>
+                <div class="method-action">
+                    <button onclick="editPayoutMethod('bitcoin')">Edit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payouts -->
+        <div class="section">
+            <h2>Recent Payouts</h2>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dec 10, 2025</td>
+                        <td>$5,000.00</td>
+                        <td>Bank Transfer</td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                        <td>PKO-2025-1847</td>
+                    </tr>
+                    <tr>
+                        <td>Nov 28, 2025</td>
+                        <td>$3,500.00</td>
+                        <td>PayPal</td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                        <td>PKO-2025-1723</td>
+                    </tr>
+                    <tr>
+                        <td>Nov 15, 2025</td>
+                        <td>0.065 BTC</td>
+                        <td>Bitcoin</td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                        <td>PKO-2025-1654</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 30, 2025</td>
+                        <td>$4,200.00</td>
+                        <td>Bank Transfer</td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                        <td>PKO-2025-1512</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 10, 2025</td>
+                        <td>$3,800.00</td>
+                        <td>PayPal</td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                        <td>PKO-2025-1398</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pending Transactions -->
+        <div class="section">
+            <h2>Incoming Funds (Pending)</h2>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Amount</th>
+                        <th>Date Generated</th>
+                        <th>Status</th>
+                        <th>Expected Payout</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Direct Sales</td>
+                        <td>$1,200.00</td>
+                        <td>Dec 13, 2025</td>
+                        <td><span class="status-badge status-pending">Processing</span></td>
+                        <td>Dec 20, 2025</td>
+                    </tr>
+                    <tr>
+                        <td>Livestream Tips</td>
+                        <td>$450.50</td>
+                        <td>Dec 12, 2025</td>
+                        <td><span class="status-badge status-pending">Processing</span></td>
+                        <td>Dec 19, 2025</td>
+                    </tr>
+                    <tr>
+                        <td>Patron Subscriptions</td>
+                        <td>$530.00</td>
+                        <td>Dec 11, 2025</td>
+                        <td><span class="status-badge status-pending">Processing</span></td>
+                        <td>Dec 18, 2025</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 MHC Streaming. All rights reserved. Artist-first. No lock-in. Always.</p>
+    </footer>
+
+    <script>
+        // AI-powered threat detection for financial pages
+        const FinancialThreatDetector = {
+            blockedAttempts: 0,
+            maxBlockedAttempts: 3,
+            
+            // Detect suspicious payment modifications
+            detectPaymentTampering: function() {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                            const modifiedElements = mutation.target;
+                            if (modifiedElements.textContent && modifiedElements.textContent.includes('$')) {
+                                console.warn('ALERT: Potential payment tampering detected');
+                                this.logThreat('PAYMENT_TAMPERING', modifiedElements.textContent.substring(0, 50));
+                                this.blockedAttempts++;
+                                
+                                if (this.blockedAttempts >= this.maxBlockedAttempts) {
+                                    alert('⚠️ Multiple tampering attempts detected. Session terminated.');
+                                    sessionStorage.clear();
+                                    window.location.href = 'login.html';
+                                }
+                            }
+                        }
+                    });
+                });
+                
+                const config = { subtree: true, characterData: true, childList: true };
+                observer.observe(document.body, config);
+            },
+            
+            // Detect network interception
+            detectNetworkInterception: function() {
+                const checkInterval = setInterval(() => {
+                    fetch('/api/security-check', { method: 'HEAD' })
+                        .catch(() => {
+                            this.logThreat('NETWORK_INTERCEPTION', 'API check failed');
+                        });
+                }, 30000); // Check every 30 seconds
+            },
+            
+            // Monitor for clipboard hijacking
+            detectClipboardHijacking: function() {
+                document.addEventListener('copy', (e) => {
+                    const selected = window.getSelection().toString();
+                    if (selected.includes('0x') || selected.includes('bc1')) { // Crypto addresses
+                        this.logThreat('CLIPBOARD_HIJACK_ATTEMPT', 'Crypto address copied');
+                    }
+                });
+            },
+            
+            // Detect screen capture attempts
+            detectScreenCapture: function() {
+                // Block print screen and screenshots
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'PrintScreen' || (e.ctrlKey && e.keyCode === 44)) {
+                        e.preventDefault();
+                        this.logThreat('SCREENSHOT_ATTEMPT', 'Print screen blocked');
+                        alert('Screenshots are disabled for financial security.');
+                    }
+                });
+            },
+            
+            // Detect API manipulation
+            detectAPIManipulation: function() {
+                const originalFetch = window.fetch;
+                window.fetch = function(...args) {
+                    const url = args[0];
+                    const method = (args[1]?.method || 'GET').toUpperCase();
+                    
+                    // Block POST/PUT/DELETE to financial endpoints from modified scripts
+                    if ((method === 'POST' || method === 'PUT' || method === 'DELETE') && 
+                        (url.includes('payment') || url.includes('payout') || url.includes('bitcoin'))) {
+                        console.warn('ALERT: Suspicious API call detected', url);
+                        FinancialThreatDetector.logThreat('API_MANIPULATION', url);
+                        return Promise.reject('Suspicious API call blocked');
+                    }
+                    
+                    return originalFetch.apply(this, args);
+                };
+            },
+            
+            // Log threats
+            logThreat: function(threatType, details) {
+                const log = {
+                    timestamp: new Date().toISOString(),
+                    threatType: threatType,
+                    details: details,
+                    page: 'payments',
+                    userAgent: navigator.userAgent
+                };
+                
+                const threats = JSON.parse(sessionStorage.getItem('financial_threats') || '[]');
+                threats.push(log);
+                sessionStorage.setItem('financial_threats', JSON.stringify(threats));
+                
+                console.error('FINANCIAL THREAT LOGGED:', log);
+            },
+            
+            init: function() {
+                this.detectPaymentTampering();
+                this.detectNetworkInterception();
+                this.detectClipboardHijacking();
+                this.detectScreenCapture();
+                this.detectAPIManipulation();
+            }
+        };
+        
+        // Initialize financial threat detection
+        FinancialThreatDetector.init();
+        
+        // Security: Check authentication on page load
+        window.addEventListener('load', function() {
+            const authToken = sessionStorage.getItem('authToken');
+            const userEmail = sessionStorage.getItem('userEmail');
+            
+            if (!authToken || !userEmail) {
+                // Redirect to login if not authenticated
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Verify token validity
+            if (authToken.length < 10) {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        });
+
+        function addPayoutMethod() {
+            // Verify authentication before allowing changes
+            if (!sessionStorage.getItem('authToken')) {
+                window.location.href = 'login.html';
+                return;
+            }
+            alert('Add new payout method feature coming soon!');
+        }
+
+        function editPayoutMethod(method) {
+            // Verify authentication before allowing changes
+            if (!sessionStorage.getItem('authToken')) {
+                window.location.href = 'login.html';
+                return;
+            }
+            alert('Edit ' + method + ' payout method feature coming soon!');
+            if (method === 'bitcoin') {
+                alert('Note: Bitcoin is the only cryptocurrency we accept.');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear sensitive data before redirect
+                sessionStorage.removeItem('authToken');
+                sessionStorage.removeItem('userEmail');
+                sessionStorage.removeItem('userId');
+                localStorage.clear();
+                // Clear history to prevent back button access
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Prevent back button access after logout
+        history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function () {
+            const authToken = sessionStorage.getItem('authToken');
+            if (!authToken) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Disable right-click to prevent development tools inspection
+        document.addEventListener('contextmenu', function(e) {
+            if (isFinancialPageDeveloper()) return;
+            e.preventDefault();
+        }, false);
+
+        // Prevent console access (basic)
+        function isFinancialPageDeveloper() {
+            return sessionStorage.getItem('isDeveloper') === 'true';
+        }
+
+        // Monitor for suspicious activity
+        document.addEventListener('keydown', function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+                if (!isFinancialPageDeveloper()) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

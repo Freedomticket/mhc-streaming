@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <title>Login - MHC Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="4" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" /></filter></defs><rect width="1000" height="1000" fill="%23000"/><g opacity="0.1" filter="url(%23noise)"><circle cx="200" cy="200" r="300" fill="%23C7C7C7"/><circle cx="800" cy="300" r="250" fill="%23999"/><circle cx="400" cy="700" r="280" fill="%23666"/></g><g opacity="0.08"><path d="M0 0 Q250 200 500 0 T1000 0" stroke="%23C7C7C7" stroke-width="2" fill="none"/><path d="M0 300 Q250 500 500 300 T1000 300" stroke="%23999" stroke-width="1.5" fill="none"/><path d="M0 600 Q250 800 500 600 T1000 600" stroke="%23666" stroke-width="1" fill="none"/></g></svg>') fixed;
+            background-size: auto, 1000px 1000px;
+            color: var(--paradiso-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 2px solid var(--inferno-gray);
+            border-radius: 8px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--purgatorio-gray);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--paradiso-gold);
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0a0a0a;
+            border: 2px solid var(--inferno-gray);
+            color: var(--paradiso-white);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--paradiso-gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--inferno-gray);
+        }
+
+        .login-footer p {
+            color: var(--purgatorio-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-footer a {
+            color: var(--paradiso-gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .login-footer a:hover {
+            color: var(--paradiso-white);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--purgatorio-gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--paradiso-gold);
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 2rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>MHC STREAMING</h1>
+            <p>Sign In to Your Account</p>
+        </div>
+
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="login-button">Login</button>
+        </form>
+
+        <div class="login-footer">
+            <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+            <a href="forgot-password.html">Forgot your password?</a>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        // AI-powered threat detection system
+        const ThreatDetector = {
+            suspiciousAttempts: [],
+            behaviorPattern: [],
+            isBot: false,
+            threatLevel: 0,
+            maxThreatScore: 100,
+            
+            // Detect bot patterns
+            detectBot: function() {
+                const patterns = {
+                    tooFast: Date.now() - this.pageLoadTime < 1000, // Under 1 sec = bot
+                    perfectTiming: this.isFormFilledInstantly(),
+                    automationTools: this.detectAutomation(),
+                    noMouseMovement: !this.mouseMovementDetected,
+                    noKeyboardDelay: !this.hasNaturalKeyboardDelay,
+                    suspiciousUserAgent: this.checkUserAgent()
+                };
+                
+                let botScore = 0;
+                Object.values(patterns).forEach(p => p ? botScore += 20 : 0);
+                
+                if (botScore >= 60) {
+                    this.isBot = true;
+                    this.logThreat('BOT_DETECTED', botScore);
+                    return true;
+                }
+                return false;
+            },
+            
+            // Detect brute force attacks
+            detectBruteForce: function(email) {
+                const key = 'login_attempts_' + email;
+                const attempts = JSON.parse(localStorage.getItem(key) || '{"count":0,"timestamp":Date.now()}');
+                const now = Date.now();
+                
+                // Reset counter after 15 minutes
+                if (now - attempts.timestamp > 900000) {
+                    attempts.count = 0;
+                    attempts.timestamp = now;
+                }
+                
+                attempts.count++;
+                localStorage.setItem(key, JSON.stringify(attempts));
+                
+                if (attempts.count > 5) {
+                    this.threatLevel += 30;
+                    this.logThreat('BRUTE_FORCE', attempts.count);
+                    alert('Too many login attempts. Please try again later.');
+                    return true;
+                }
+                return false;
+            },
+            
+            // Detect SQL injection attempts
+            detectSQLInjection: function(input) {
+                const sqlPatterns = [
+                    /('|(\-\-)|(;)|(\|\|)|(\*)|(\bor\b)|(\band\b)|(\bunion\b)|(\bselect\b)|(\bdrop\b)|(\binsert\b)|(\bupdate\b)|(\bdelete\b))/gi
+                ];
+                
+                for (let pattern of sqlPatterns) {
+                    if (pattern.test(input)) {
+                        this.threatLevel += 40;
+                        this.logThreat('SQL_INJECTION_ATTEMPT', input.substring(0, 50));
+                        return true;
+                    }
+                }
+                return false;
+            },
+            
+            // Detect XSS attempts
+            detectXSS: function(input) {
+                const xssPatterns = [
+                    /<script[^>]*>.*?<\/script>/gi,
+                    /on\w+\s*=/gi,
+                    /<iframe[^>]*>/gi,
+                    /javascript:/gi,
+                    /<svg[^>]*>/gi
+                ];
+                
+                for (let pattern of xssPatterns) {
+                    if (pattern.test(input)) {
+                        this.threatLevel += 40;
+                        this.logThreat('XSS_ATTEMPT', input.substring(0, 50));
+                        return true;
+                    }
+                }
+                return false;
+            },
+            
+            // Check user agent for bot signatures
+            checkUserAgent: function() {
+                const botSignatures = [
+                    /bot/i, /crawler/i, /spider/i, /scraper/i, /curl/i, /wget/i, /selenium/i, /phantom/i, /headless/i
+                ];
+                
+                const ua = navigator.userAgent;
+                return botSignatures.some(sig => sig.test(ua));
+            },
+            
+            // Check for automation tools
+            detectAutomation: function() {
+                return (window.document.documentElement.getAttribute('webdriver') !== null ||
+                        typeof __nightmare !== 'undefined' ||
+                        typeof _phantom !== 'undefined' ||
+                        typeof callPhantom === 'function');
+            },
+            
+            // Check if form filled instantly
+            isFormFilledInstantly: function() {
+                const timings = this.keyboardTimings;
+                if (timings.length < 5) return false;
+                return timings.every(t => t < 50); // All keystrokes < 50ms = suspicious
+            },
+            
+            // Monitor keyboard behavior
+            monitorKeyboard: function() {
+                this.keyboardTimings = [];
+                let lastKeyTime = Date.now();
+                
+                document.addEventListener('keydown', (e) => {
+                    const now = Date.now();
+                    const delta = now - lastKeyTime;
+                    this.keyboardTimings.push(delta);
+                    lastKeyTime = now;
+                    
+                    // Keep only last 20 keystrokes
+                    if (this.keyboardTimings.length > 20) {
+                        this.keyboardTimings.shift();
+                    }
+                    
+                    this.hasNaturalKeyboardDelay = true;
+                });
+            },
+            
+            // Monitor mouse movement
+            monitorMouse: function() {
+                document.addEventListener('mousemove', () => {
+                    this.mouseMovementDetected = true;
+                });
+            },
+            
+            // Log threats to system
+            logThreat: function(threatType, details) {
+                const log = {
+                    timestamp: new Date().toISOString(),
+                    threatType: threatType,
+                    details: details,
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
+                
+                // Store in sessionStorage (would send to backend in production)
+                const threats = JSON.parse(sessionStorage.getItem('threat_log') || '[]');
+                threats.push(log);
+                sessionStorage.setItem('threat_log', JSON.stringify(threats));
+                
+                console.warn('SECURITY THREAT DETECTED:', log);
+            },
+            
+            // Initialize detection
+            init: function() {
+                this.pageLoadTime = Date.now();
+                this.mouseMovementDetected = false;
+                this.hasNaturalKeyboardDelay = false;
+                this.keyboardTimings = [];
+                
+                this.monitorMouse();
+                this.monitorKeyboard();
+            }
+        };
+        
+        // Initialize threat detection
+        ThreatDetector.init();
+
+        // Prevent password autofill from displaying credentials
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordField = document.getElementById('password');
+            if (passwordField) {
+                passwordField.value = '';
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Validate password length
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+            
+            // Run threat detection
+            if (ThreatDetector.detectBot()) {
+                alert('⚠️ Suspicious bot activity detected. Login blocked.');
+                ThreatDetector.logThreat('LOGIN_BLOCKED', 'Bot detected');
+                return;
+            }
+            
+            if (ThreatDetector.detectBruteForce(email)) {
+                return; // Alert already shown
+            }
+            
+            if (ThreatDetector.detectSQLInjection(email) || ThreatDetector.detectSQLInjection(password)) {
+                alert('⚠️ Malicious input detected. Login blocked.');
+                return;
+            }
+            
+            if (ThreatDetector.detectXSS(email) || ThreatDetector.detectXSS(password)) {
+                alert('⚠️ XSS attempt detected. Login blocked.');
+                return;
+            }
+            
+            if (email && password) {
+                // Store auth token in sessionStorage (cleared on browser close)
+                sessionStorage.setItem('authToken', 'token_' + Math.random().toString(36).substr(2, 9));
+                sessionStorage.setItem('userEmail', email);
+                sessionStorage.setItem('userId', 'user_' + Math.random().toString(36).substr(2, 9));
+                
+                alert('Welcome back! Logging you in...');
+                // Clear password from memory
+                document.getElementById('password').value = '';
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

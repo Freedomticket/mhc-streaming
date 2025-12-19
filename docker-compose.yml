@@ -1,0 +1,199 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: mhc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mhc_streaming
+      POSTGRES_USER: mhc_user
+      POSTGRES_PASSWORD: mhc_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mhc_user -d mhc_streaming"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: mhc-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Auth Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: mhc-auth-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-jwt-secret-change-in-production
+      JWT_REFRESH_SECRET: your-refresh-secret-change-in-production
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/auth-service:/app/services/auth-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: mhc-api-gateway
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      AUTH_SERVICE_URL: http://auth-service:3001
+      MEDIA_SERVICE_URL: http://media-service:3002
+      STREAM_SERVICE_URL: http://stream-service:3003
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+      ANALYTICS_SERVICE_URL: http://analytics-service:3005
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+      - auth-service
+    volumes:
+      - ./services/api-gateway:/app/services/api-gateway
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # Media Service
+  media-service:
+    build:
+      context: .
+      dockerfile: services/media-service/Dockerfile
+    container_name: mhc-media-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+      AWS_REGION: us-east-1
+      S3_BUCKET: mhc-media-bucket
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/media-service:/app/services/media-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # Stream Service
+  stream-service:
+    build:
+      context: .
+      dockerfile: services/stream-service/Dockerfile
+    container_name: mhc-stream-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+      RTMP_PORT: 1935
+    ports:
+      - "3003:3003"
+      - "1935:1935"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/stream-service:/app/services/stream-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # Payment Service
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment-service/Dockerfile
+    container_name: mhc-payment-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+      STRIPE_SECRET_KEY: sk_test_your_stripe_key
+      STRIPE_WEBHOOK_SECRET: whsec_your_webhook_secret
+    ports:
+      - "3004:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/payment-service:/app/services/payment-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # Analytics Service
+  analytics-service:
+    build:
+      context: .
+      dockerfile: services/analytics-service/Dockerfile
+    container_name: mhc-analytics-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3005:3005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/analytics-service:/app/services/analytics-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:

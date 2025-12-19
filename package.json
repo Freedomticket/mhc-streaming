@@ -1,0 +1,40 @@
+{
+  "name": "mhc-streaming",
+  "version": "1.0.0",
+  "description": "MOST HIGH CREATION STREAMING - A decentralized streaming platform with Dante realm theming",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:gateway\" \"npm run dev:auth\"",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:gateway": "cross-env PORT=4000 npm run dev --workspace=@mhc/api-gateway",
+    "dev:auth": "cross-env PORT=3001 npm run dev --workspace=@mhc/auth-service",
+    "build": "npm run build --workspaces",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:services": "npm run build --workspaces --workspace=services/*",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "deploy:frontend": "npm run deploy --workspace=frontend",
+    "deploy:services": "node scripts/deploy-services.js",
+    "infra:init": "cd terraform && terraform init",
+    "infra:plan": "cd terraform && terraform plan",
+    "infra:apply": "cd terraform && terraform apply",
+    "infra:destroy": "cd terraform && terraform destroy"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
+    "typescript": "^5.3.3"
+  },
+  "author": "MHC Streaming Team",
+  "license": "UNLICENSED"
+}

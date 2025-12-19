@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <title>Admin Login - MHC Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --inferno-dark: #000000;
+            --inferno-gray: #999999;
+            --purgatorio-gray: #C7C7C7;
+            --paradiso-white: #FFFFFF;
+            --paradiso-gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: #0a0a0a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="4" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" /></filter></defs><rect width="1000" height="1000" fill="%23000"/><g opacity="0.1" filter="url(%23noise)"><circle cx="200" cy="200" r="300" fill="%23C7C7C7"/><circle cx="800" cy="300" r="250" fill="%23999"/><circle cx="400" cy="700" r="280" fill="%23666"/></g><g opacity="0.08"><path d="M0 0 Q250 200 500 0 T1000 0" stroke="%23C7C7C7" stroke-width="2" fill="none"/><path d="M0 300 Q250 500 500 300 T1000 300" stroke="%23999" stroke-width="1.5" fill="none"/><path d="M0 600 Q250 800 500 600 T1000 600" stroke="%23666" stroke-width="1" fill="none"/></g></svg>') fixed;
+            background-size: auto, 1000px 1000px;
+            color: var(--paradiso-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--inferno-dark);
+            color: var(--paradiso-white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(153, 153, 153, 0.3);
+            border-bottom: 1px solid var(--inferno-gray);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--paradiso-gold);
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--paradiso-white);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--paradiso-gold);
+        }
+
+        /* Login Container */
+        .login-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+            border: 3px solid var(--inferno-gray);
+            border-radius: 8px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            margin-top: 80px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            color: var(--paradiso-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--purgatorio-gray);
+            font-size: 0.95rem;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--paradiso-white);
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0a0a0a;
+            border: 2px solid var(--inferno-gray);
+            border-radius: 4px;
+            color: var(--paradiso-white);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--paradiso-gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .verification-section {
+            background: #0a0a0a;
+            border: 1px solid var(--inferno-gray);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .verification-section p {
+            color: var(--purgatorio-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .verification-code {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-input {
+            width: 50px;
+            height: 50px;
+            padding: 0;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .verify-button {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .verify-button:hover {
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--paradiso-gold);
+            color: var(--inferno-dark);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .login-button:hover {
+            background: #FFE500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .login-button:disabled {
+            background: var(--inferno-gray);
+            color: var(--paradiso-white);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .info-section {
+            background: #0a0a0a;
+            border-left: 4px solid var(--paradiso-gold);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section h3 {
+            color: var(--paradiso-gold);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .info-section p {
+            color: var(--purgatorio-gray);
+            font-size: 0.85rem;
+        }
+
+        .verified-badge {
+            display: none;
+            color: #00ff00;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .verified-badge.show {
+            display: block;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 2rem;
+                max-width: 100%;
+                margin: 100px 1rem 0;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .code-input {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">MHC STREAMING</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">User Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-header">
+            <h1>ADMIN PORTAL</h1>
+            <p>Jackson Hinkle - Platform Administrator</p>
+            <div class="admin-badge">⚙️ ADMIN ACCESS</div>
+        </div>
+
+        <div class="info-section">
+            <h3>Authorized Admin Email</h3>
+            <p>jhinklewfg@gmail.com</p>
+        </div>
+
+        <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+            <!-- Step 1: Email Verification -->
+            <div id="emailStep">
+                <div class="form-group">
+                    <label for="adminEmail">Admin Email</label>
+                    <input type="email" id="adminEmail" name="adminEmail" placeholder="Enter your admin email" required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <button type="button" class="verify-button" onclick="verifyEmail()">Send Verification Code</button>
+            </div>
+
+            <!-- Step 2: Email Verification Code -->
+            <div id="verificationStep" style="display: none;">
+                <div class="verification-section">
+                    <p>Enter the 6-digit code sent to your email:</p>
+                    <div class="verification-code" id="codeInputs">
+                        <input type="text" class="code-input" maxlength="1" inputmode="numeric" onkeyup="handleCodeInput(this, event)">
+                        <input type="text" class="code-input" maxlength="1" inputmode="numeric" onkeyup="handleCodeInput(this, event)">
+                        <input type="text" class="code-input" maxlength="1" inputmode="numeric" onkeyup="handleCodeInput(this, event)">
+                        <input type="text" class="code-input" maxlength="1" inputmode="numeric" onkeyup="handleCodeInput(this, event)">
+                        <input type="text" class="code-input" maxlength="1" inputmode="numeric" onkeyup="handleCodeInput(this, event)">
+                        <input type="text" class="code-input" maxlength="1" inputmode="numeric" onkeyup="handleCodeInput(this, event)">
+                    </div>
+                    <div class="error-message" id="codeError"></div>
+                    <div class="verified-badge" id="verifiedBadge">✓ Email Verified</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" name="adminPassword" placeholder="Enter your admin password" required disabled>
+                </div>
+
+                <button type="submit" class="login-button" id="loginBtn" disabled>Access Admin Dashboard</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const CORRECT_EMAIL = 'jhinklewfg@gmail.com';
+        const CORRECT_CODE = '123456';
+        let emailVerified = false;
+
+        function verifyEmail() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const emailError = document.getElementById('emailError');
+
+            emailError.textContent = '';
+
+            if (!email) {
+                emailError.textContent = 'Please enter an email address';
+                return;
+            }
+
+            if (email.toLowerCase() !== CORRECT_EMAIL.toLowerCase()) {
+                emailError.textContent = 'This email is not authorized for admin access';
+                return;
+            }
+
+            // Show verification step
+            document.getElementById('emailStep').style.display = 'none';
+            document.getElementById('verificationStep').style.display = 'block';
+            document.querySelector('.code-input').focus();
+            
+            alert(`Verification code sent to ${email}\nFor demo: Use 123456`);
+        }
+
+        function handleCodeInput(input, event) {
+            const codeInputs = document.querySelectorAll('.code-input');
+            const fullCode = Array.from(codeInputs).map(el => el.value).join('');
+            
+            // Move to next input on number entry
+            if (event.key >= '0' && event.key <= '9') {
+                const nextInput = input.nextElementSibling;
+                if (nextInput && nextInput.classList.contains('code-input')) {
+                    nextInput.focus();
+                }
+            }
+            
+            // Move to previous input on backspace
+            if (event.key === 'Backspace') {
+                const prevInput = input.previousElementSibling;
+                if (prevInput && prevInput.classList.contains('code-input')) {
+                    prevInput.focus();
+                }
+            }
+
+            // Check if all code inputs are filled
+            if (fullCode.length === 6) {
+                verifyCode(fullCode);
+            }
+        }
+
+        function verifyCode(code) {
+            const codeError = document.getElementById('codeError');
+            const verifiedBadge = document.getElementById('verifiedBadge');
+            const passwordInput = document.getElementById('adminPassword');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (code === CORRECT_CODE) {
+                codeError.textContent = '';
+                verifiedBadge.classList.add('show');
+                emailVerified = true;
+                passwordInput.disabled = false;
+                loginBtn.disabled = false;
+                passwordInput.focus();
+            } else {
+                codeError.textContent = 'Invalid verification code';
+                verifiedBadge.classList.remove('show');
+                emailVerified = false;
+                passwordInput.disabled = true;
+                loginBtn.disabled = true;
+                // Clear code inputs
+                document.querySelectorAll('.code-input').forEach(el => el.value = '');
+                document.querySelector('.code-input').focus();
+            }
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+
+            if (!emailVerified) {
+                alert('Please verify your email first');
+                return;
+            }
+
+            const password = document.getElementById('adminPassword').value;
+            const email = document.getElementById('adminEmail').value;
+
+            if (!password) {
+                alert('Please enter a password');
+                return;
+            }
+
+            // Demo validation - in production, this would call backend
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            // Simulate successful login
+            alert(`Welcome, Jackson Hinkle!\n\nLogged in as: ${email}\nAccess Level: Full Administrator`);
+            
+            // Redirect to admin dashboard (would be a real admin page in production)
+            window.location = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
