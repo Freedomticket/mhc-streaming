@@ -247,6 +247,31 @@ services:
       - /app/node_modules
     command: npm run dev
 
+  # AI Service (Recommendations, Moderation, Discovery, Analytics)
+  ai-service:
+    build:
+      context: .
+      dockerfile: services/ai-service/Dockerfile
+    container_name: mhc-ai-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3008
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3008:3008"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/ai-service:/app/services/ai-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
   # MinIO (S3-compatible object storage - replaces Google Cloud Storage)
   minio:
     image: minio/minio:latest
