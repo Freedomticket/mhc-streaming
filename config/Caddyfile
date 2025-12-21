@@ -1,0 +1,72 @@
+# MHC Streaming - Caddy Configuration
+# Automatic HTTPS, reverse proxy for all services
+
+# Main API Gateway
+:80 {
+    # API Gateway
+    handle /api/* {
+        reverse_proxy api-gateway:3000
+    }
+
+    # Music Streaming (Navidrome)
+    handle /music/* {
+        reverse_proxy navidrome:4533
+    }
+
+    # Video Streaming (PeerTube)
+    handle /videos/* {
+        reverse_proxy peertube:9002
+    }
+
+    # Social/Chat (Matrix Synapse)
+    handle /_matrix/* {
+        reverse_proxy synapse:8008
+    }
+
+    # Element Web Client (Chat UI)
+    handle /chat/* {
+        reverse_proxy element:80
+    }
+
+    # MinIO S3 API
+    handle /s3/* {
+        reverse_proxy minio:9000
+    }
+
+    # MinIO Console
+    handle /minio/* {
+        reverse_proxy minio:9001
+    }
+
+    # IPFS Gateway
+    handle /ipfs/* {
+        reverse_proxy ipfs:8080
+    }
+
+    # Default: serve frontend or redirect to API docs
+    handle {
+        respond "MHC Streaming API - All systems operational" 200
+    }
+
+    # Enable compression
+    encode gzip
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+}
+
+# Direct service access (for development)
+:4533 {
+    reverse_proxy navidrome:4533
+}
+
+:9002 {
+    reverse_proxy peertube:9002
+}
+
+:8008 {
+    reverse_proxy synapse:8008
+}

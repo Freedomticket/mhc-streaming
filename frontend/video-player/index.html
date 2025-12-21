@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHC Video Streaming - Inferno Realm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000000; /* infernoDark */
+            color: #FFFFFF; /* paradisoWhite */
+            min-height: 100vh;
+        }
+
+        .realm-inferno {
+            background: linear-gradient(135deg, #000000 0%, #1a0000 100%);
+        }
+
+        header {
+            padding: 20px;
+            border-bottom: 2px solid #333333;
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #FFFFFF;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            border-color: #C7C7C7; /* purgatorioGray */
+            box-shadow: 0 10px 30px rgba(199, 199, 199, 0.2);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .video-card:hover .play-overlay {
+            transform: scale(1.1);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 20px solid #000000;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 5px;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+        }
+
+        .video-meta {
+            color: #C7C7C7;
+            font-size: 0.9em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .modal video {
+            width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: #C7C7C7;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            background: #FFFFFF;
+        }
+
+        .upload-section {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px dashed #333333;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .upload-btn {
+            background: #C7C7C7;
+            color: #000000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: #FFFFFF;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .status-message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #C7C7C7;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body class="realm-inferno">
+    <header>
+        <h1>🔥 MHC Video Streaming</h1>
+        <p style="color: #C7C7C7; margin-top: 10px;">INFERNO REALM - Lightweight Edition</p>
+    </header>
+
+    <div class="container">
+        <div class="upload-section">
+            <h2 style="margin-bottom: 20px; color: #FFFFFF;">Upload Video</h2>
+            <p style="color: #C7C7C7; margin-bottom: 20px;">
+                Drop your video files in <code>media/videos/</code> folder, then refresh this page.
+            </p>
+            <button class="upload-btn" onclick="showUploadInstructions()">
+                Upload Instructions
+            </button>
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+        <h2 style="margin-bottom: 20px; color: #FFFFFF;">Available Videos</h2>
+        <div id="videoGrid" class="video-grid">
+            <!-- Videos loaded dynamically -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h2>No Videos Yet</h2>
+            <p>Copy video files to <code>media/videos/</code> to get started.</p>
+            <p style="margin-top: 10px;">Supported formats: MP4, WebM, OGG</p>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeVideo()">✕ Close</button>
+            <video id="modalVideo" controls autoplay>
+                <source src="" type="video/mp4">
+                Your browser does not support video playback.
+            </video>
+            <div style="color: #FFFFFF; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.8); border-radius: 4px;">
+                <h3 id="modalTitle" style="margin-bottom: 10px;"></h3>
+                <p id="modalMeta" style="color: #C7C7C7;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load videos from /videos directory
+        async function loadVideos() {
+            try {
+                const response = await fetch('/videos/');
+                const html = await response.text();
+                
+                // Parse directory listing (nginx autoindex)
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = Array.from(doc.querySelectorAll('a'))
+                    .map(a => a.getAttribute('href'))
+                    .filter(href => href && 
+                        (href.endsWith('.mp4') || href.endsWith('.webm') || href.endsWith('.ogg')));
+
+                if (links.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    return;
+                }
+
+                const grid = document.getElementById('videoGrid');
+                grid.innerHTML = '';
+
+                links.forEach(filename => {
+                    const card = createVideoCard(filename);
+                    grid.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
+
+        function createVideoCard(filename) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.onclick = () => playVideo(filename);
+
+            const videoPath = `/videos/${filename}`;
+            const displayName = filename.replace(/\.[^/.]+$/, '').replace(/_/g, ' ');
+
+            card.innerHTML = `
+                <div class="video-thumbnail">
+                    <video src="${videoPath}" preload="metadata"></video>
+                    <div class="play-overlay">
+                        <div class="play-icon"></div>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">${displayName}</div>
+                    <div class="video-meta">Click to play</div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function playVideo(filename) {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('modalVideo');
+            const title = document.getElementById('modalTitle');
+            const meta = document.getElementById('modalMeta');
+
+            const videoPath = `/videos/${filename}`;
+            const displayName = filename.replace(/\.[^/.]+$/, '').replace(/_/g, ' ');
+
+            video.src = videoPath;
+            title.textContent = displayName;
+            meta.textContent = `File: ${filename}`;
+            
+            modal.classList.add('active');
+        }
+
+        function closeVideo() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('modalVideo');
+            
+            video.pause();
+            video.src = '';
+            modal.classList.remove('active');
+        }
+
+        function showUploadInstructions() {
+            const msg = document.getElementById('statusMessage');
+            msg.className = 'status-message success';
+            msg.style.display = 'block';
+            msg.innerHTML = `
+                <strong>How to Upload Videos:</strong><br><br>
+                1. Copy your video files to: <code>C:\\Users\\jhink\\mhc-streaming\\media\\videos\\</code><br>
+                2. Refresh this page<br>
+                3. Videos appear automatically<br><br>
+                <em>Supported: MP4, WebM, OGG</em>
+            `;
+        }
+
+        // Keyboard shortcut: ESC to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeVideo();
+            }
+        });
+
+        // Load videos on page load
+        window.addEventListener('DOMContentLoaded', loadVideos);
+    </script>
+</body>
+</html>

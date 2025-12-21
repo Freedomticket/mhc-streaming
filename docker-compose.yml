@@ -194,6 +194,186 @@ services:
       - /app/node_modules
     command: npm run dev
 
+  # Moderation Service (AI Content Filtering)
+  moderation-service:
+    build:
+      context: .
+      dockerfile: services/moderation-service/Dockerfile
+    container_name: mhc-moderation-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3006
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3006:3006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/moderation-service:/app/services/moderation-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # Royalty Service (Automated Artist Payments)
+  royalty-service:
+    build:
+      context: .
+      dockerfile: services/royalty-service/Dockerfile
+    container_name: mhc-royalty-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3007
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_SECRET: ${PAYPAL_SECRET}
+    ports:
+      - "3007:3007"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/royalty-service:/app/services/royalty-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    command: npm run dev
+
+  # MinIO (S3-compatible object storage - replaces Google Cloud Storage)
+  minio:
+    image: minio/minio:latest
+    container_name: mhc-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: mhc_admin
+      MINIO_ROOT_PASSWORD: mhc_minio_password_change_me
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Navidrome (Music Streaming - Spotify-like)
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: mhc-navidrome
+    restart: unless-stopped
+    environment:
+      ND_SCANSCHEDULE: "1h"
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    ports:
+      - "4533:4533"
+    volumes:
+      - navidrome_data:/data
+      - ./media/music:/music:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4533/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Video Service (Lightweight - <10MB image)
+  video-service:
+    image: nginx:alpine
+    container_name: mhc-video-service
+    restart: unless-stopped
+    ports:
+      - "9002:80"
+    volumes:
+      - ./media/videos:/usr/share/nginx/html/videos:ro
+      - ./config/video-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/video-player:/usr/share/nginx/html:ro
+    depends_on:
+      - minio
+
+  # Chat Service (Lightweight WebSocket-based chat - <50MB)
+  chat-service:
+    build:
+      context: ./services/chat-service
+      dockerfile: Dockerfile
+    container_name: mhc-chat-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 8008
+      DATABASE_URL: postgresql://mhc_user:mhc_password@postgres:5432/mhc_streaming
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-jwt-secret-change-in-production
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./services/chat-service:/app/services/chat-service
+      - ./packages:/app/packages
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+
+  # MailDev (Email testing for development)
+  maildev:
+    image: maildev/maildev:latest
+    container_name: mhc-maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  # IPFS (Decentralized storage for static assets)
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: mhc-ipfs
+    restart: unless-stopped
+    environment:
+      IPFS_PROFILE: server
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8081:8080"
+    volumes:
+      - ipfs_data:/data/ipfs
+
+  # Caddy (Reverse proxy with automatic HTTPS - replaces nginx/Cloudflare locally)
+  caddy:
+    image: caddy:latest
+    container_name: mhc-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api-gateway
+      - navidrome
+      - peertube
+      - synapse
+
 volumes:
   postgres_data:
   redis_data:
+  minio_data:
+  navidrome_data:
+  ipfs_data:
+  caddy_data:
+  caddy_config:
