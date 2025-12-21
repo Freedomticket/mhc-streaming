@@ -507,3 +507,108 @@ model RoyaltyPayoutItem {
   @@index([royaltyId])
   @@index([payoutId])
 }
+
+// ============ AI SERVICE MODELS ============
+
+// User interactions for recommendation engine
+model UserInteraction {
+  id              String   @id @default(cuid())
+  userId          String
+  contentId       String
+  contentType     String   // 'video', 'audio', 'stream'
+  action          String   // 'view', 'like', 'skip', 'complete', 'share'
+  watchTime       Int?     // Seconds watched
+  totalDuration   Int?     // Total content duration
+  completionRate  Float?   // watchTime / totalDuration
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([userId])
+  @@index([contentId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Generic content model for AI recommendations
+model Content {
+  id          String   @id @default(cuid())
+  userId      String   // Creator
+  title       String
+  description String?
+  category    String?
+  tags        String[] @default([])
+  danteRealm  String?  // 'inferno', 'purgatorio', 'paradiso'
+  isPublic    Boolean  @default(true)
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([category])
+  @@index([isPublic])
+  @@index([createdAt])
+}
+
+// Blocked content for moderation
+model BlockedContent {
+  id        String   @id @default(cuid())
+  type      String   // 'hash' or 'keyword'
+  value     String
+  reason    String?
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([type, value])
+  @@index([type])
+}
+
+// Content reports from users
+model ContentReport {
+  id          String   @id @default(cuid())
+  contentId   String
+  reporterId  String
+  reason      String
+  status      String   @default("pending") // 'pending', 'reviewed', 'actioned'
+  
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+  
+  @@index([contentId])
+  @@index([reporterId])
+  @@index([status])
+}
+
+// Moderation queue for human review
+model ModerationQueue {
+  id        String   @id @default(cuid())
+  contentId String
+  reason    String
+  priority  String   @default("medium") // 'low', 'medium', 'high', 'critical'
+  status    String   @default("pending") // 'pending', 'in_review', 'completed'
+  reviewerId String?
+  
+  createdAt  DateTime @default(now())
+  reviewedAt DateTime?
+  
+  @@index([contentId])
+  @@index([status])
+  @@index([priority])
+}
+
+// Stream analytics for AI service
+model StreamAnalytics {
+  id           String   @id @default(cuid())
+  streamId     String
+  userId       String   // Stream creator
+  duration     Int      // Stream duration in seconds
+  peakViewers  Int
+  totalViews   Int
+  
+  createdAt    DateTime @default(now())
+  
+  @@index([streamId])
+  @@index([userId])
+  @@index([createdAt])
+}
