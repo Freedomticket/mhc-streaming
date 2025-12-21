@@ -40,6 +40,7 @@ module.exports = {
           platinum: '#E5E5E5',
           pearl: '#F5F5F5',
           crystal: '#EFEFEF',
+          gold: '#FFD700',
         },
         // Legacy support
         infernoDark: '#000000',

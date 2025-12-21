@@ -20,7 +20,7 @@
 @layer components {
   /* Realm-specific button styles */
   .btn-inferno {
-    @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200 shadow-inferno;
+    @apply bg-gray-600 hover:bg-paradiso-gold hover:text-black text-white font-bold py-2 px-6 rounded-lg transition-all duration-200;
   }
   
   .btn-purgatorio {
@@ -50,7 +50,7 @@
   }
   
   .input-inferno {
-    @apply input-base border-inferno-border focus:ring-red-600;
+    @apply input-base border-inferno-border focus:ring-paradiso-gold;
   }
   
   .input-purgatorio {
