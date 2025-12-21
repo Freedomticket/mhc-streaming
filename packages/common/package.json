@@ -9,7 +9,9 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "jsonwebtoken": "^9.0.2",
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",
