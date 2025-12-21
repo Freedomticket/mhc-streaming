@@ -153,9 +153,6 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <svg className="w-16 h-16 mb-2 text-paradiso-gold animate-flicker" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C12 2 7 6 7 11C7 14 9 16 12 16C15 16 17 14 17 11C17 6 12 2 12 2Z M12 14C11 14 10 13 10 11.5C10 9.5 12 7 12 7C12 7 14 9.5 14 11.5C14 13 13 14 12 14Z M8 18C8 18 6 19 6 20.5C6 21.9 7.1 23 8.5 23C9.9 23 11 21.9 11 20.5C11 19 9 18 9 18H8Z M15 18C15 18 13 19 13 20.5C13 21.9 14.1 23 15.5 23C16.9 23 18 21.9 18 20.5C18 19 16 18 16 18H15Z"/>
-                  </svg>
                   <h3 className="text-3xl font-display font-bold mb-2 text-etched text-shadow-inferno">
                     INFERNO
                   </h3>
@@ -191,9 +188,6 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <svg className="w-16 h-16 mb-2 text-purgatorio-mist animate-float" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M3 15C3 15 5 17 8 17C11 17 13 15 13 15M13 15C13 15 15 17 18 17C21 17 23 15 23 15M3 8C3 8 5 10 8 10C11 10 13 8 13 8M13 8C13 8 15 10 18 10C21 10 23 8 23 8" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
                   <h3 className="text-3xl font-display font-bold mb-2 text-ascend text-shadow-purgatorio">
                     PURGATORIO
                   </h3>
@@ -229,9 +223,6 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <svg className="w-16 h-16 mb-2 text-paradiso-gold animate-pulse-glow" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z M12 7L10.5 11L7 12.5L10.5 14L12 18L13.5 14L17 12.5L13.5 11L12 7Z"/>
-                  </svg>
                   <h3 className="text-3xl font-display font-bold mb-2 text-divine text-shadow-paradiso">
                     PARADISO
                   </h3>
@@ -266,19 +257,19 @@ export default function HomePage() {
           >
             Browse Content
           </Link>
+          <Link
+            href="/discover"
+            className="text-paradiso-gold hover:text-white transition-colors underline text-lg"
+          >
+            Discover Artists
+          </Link>
         </div>
 
         {/* Features */}
         <div className="max-w-6xl mx-auto mt-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="card-inferno text-center">
-              <div className="mb-4">
-                <svg viewBox="0 0 24 24" className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M9 18c-4.411 0-8-1.79-8-4s3.589-4 8-4 8 1.79 8 4-3.589 4-8 4z"/>
-                  <path d="M9 5v7M15 9v4"/>
-                </svg>
-              </div>
-              <h3 className="text-xl font-display font-bold mb-2 text-paradiso-gold">
+              <h3 className="text-xl font-display font-bold mb-2 text-white">
                 Artist-First
               </h3>
               <p className="text-gray-400 text-sm">
@@ -287,13 +278,7 @@ export default function HomePage() {
             </div>
 
             <div className="card-inferno text-center">
-              <div className="mb-4">
-                <svg viewBox="0 0 24 24" className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-              </div>
-              <h3 className="text-xl font-display font-bold mb-2 text-purgatorio-mist">
+              <h3 className="text-xl font-display font-bold mb-2 text-white">
                 Decentralized
               </h3>
               <p className="text-gray-400 text-sm">
@@ -302,12 +287,7 @@ export default function HomePage() {
             </div>
 
             <div className="card-inferno text-center">
-              <div className="mb-4">
-                <svg viewBox="0 0 24 24" className="w-12 h-12 mx-auto" fill="currentColor">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-              </div>
-              <h3 className="text-xl font-display font-bold mb-2 text-paradiso-gold">
+              <h3 className="text-xl font-display font-bold mb-2 text-white">
                 Real-Time
               </h3>
               <p className="text-gray-400 text-sm">
@@ -511,7 +491,7 @@ export default function HomePage() {
           </div>
           
           {/* Card Fade Animation - Longer for dramatic gate opening */}
-          <style jsx>{`
+          <style jsx global>{`
             @keyframes cardFadeInOut {
               0% { opacity: 0.3; transform: scale(0.95); }
               20% { opacity: 0.5; transform: scale(0.97); }

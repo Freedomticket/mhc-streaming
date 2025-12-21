@@ -366,8 +366,7 @@ services:
     depends_on:
       - api-gateway
       - navidrome
-      - peertube
-      - synapse
+      - video-service
 
 volumes:
   postgres_data:

@@ -2,22 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy root package files
-COPY package*.json ./
-COPY tsconfig*.json ./
-
-# Copy workspace packages
-COPY packages ./packages
-COPY services/moderation-service ./services/moderation-service
+# Copy only package files first for better caching
+COPY services/moderation-service/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Build
-RUN npm run build --workspace=@mhc/moderation-service
-
-WORKDIR /app/services/moderation-service
+# Copy source code
+COPY services/moderation-service/src ./src
 
 EXPOSE 3006
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

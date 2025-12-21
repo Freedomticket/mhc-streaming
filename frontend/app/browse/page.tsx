@@ -72,9 +72,6 @@ export default function BrowsePage() {
             <div className="card-inferno hover-lift group">
               <div className="realm-inferno rounded-lg p-8 mb-4 min-h-[200px] flex items-center justify-center relative overflow-hidden">
                 <div className="text-center relative z-10">
-                  <svg className="w-20 h-20 mb-4 mx-auto text-paradiso-gold animate-flicker" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C12 2 7 6 7 11C7 14 9 16 12 16C15 16 17 14 17 11C17 6 12 2 12 2Z M12 14C11 14 10 13 10 11.5C10 9.5 12 7 12 7C12 7 14 9.5 14 11.5C14 13 13 14 12 14Z M8 18C8 18 6 19 6 20.5C6 21.9 7.1 23 8.5 23C9.9 23 11 21.9 11 20.5C11 19 9 18 9 18H8Z M15 18C15 18 13 19 13 20.5C13 21.9 14.1 23 15.5 23C16.9 23 18 21.9 18 20.5C18 19 16 18 16 18H15Z"/>
-                  </svg>
                   <h3 className="text-etched text-2xl font-display text-shadow-inferno">INFERNO</h3>
                 </div>
               </div>
@@ -90,9 +87,6 @@ export default function BrowsePage() {
             <div className="card-purgatorio hover-lift group">
               <div className="realm-purgatorio rounded-lg p-8 mb-4 min-h-[200px] flex items-center justify-center relative overflow-hidden">
                 <div className="text-center relative z-10">
-                  <svg className="w-20 h-20 mb-4 mx-auto text-purgatorio-mist animate-float" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M3 15C3 15 5 17 8 17C11 17 13 15 13 15M13 15C13 15 15 17 18 17C21 17 23 15 23 15M3 8C3 8 5 10 8 10C11 10 13 8 13 8M13 8C13 8 15 10 18 10C21 10 23 8 23 8" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
                   <h3 className="text-ascend text-2xl font-display text-shadow-purgatorio">PURGATORIO</h3>
                 </div>
               </div>
@@ -108,9 +102,6 @@ export default function BrowsePage() {
             <div className="card-paradiso hover-lift group">
               <div className="realm-paradiso rounded-lg p-8 mb-4 min-h-[200px] flex items-center justify-center relative overflow-hidden">
                 <div className="text-center relative z-10">
-                  <svg className="w-20 h-20 mb-4 mx-auto text-paradiso-gold animate-pulse-glow" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z M12 7L10.5 11L7 12.5L10.5 14L12 18L13.5 14L17 12.5L13.5 11L12 7Z"/>
-                  </svg>
                   <h3 className="text-divine text-2xl font-display text-shadow-paradiso">PARADISO</h3>
                 </div>
               </div>
