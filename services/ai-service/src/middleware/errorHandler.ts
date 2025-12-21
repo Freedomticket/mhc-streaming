@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { errorResponse, HTTP_STATUS } from '@mhc/common';
 
 export function errorHandler(
   err: any,
@@ -9,14 +8,15 @@ export function errorHandler(
 ) {
   console.error('AI Service Error:', err);
 
-  const status = err.status || err.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR;
+  const status = err.status || err.statusCode || 500;
   const message = err.message || 'AI service error';
 
-  res.status(status).json(
-    errorResponse({
+  res.status(status).json({
+    success: false,
+    error: {
       code: err.code || 'AI_ERROR',
       message,
       details: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-    })
-  );
+    }
+  });
 }
