@@ -121,40 +121,128 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Realm Selection */}
-        <div className="max-w-6xl mx-auto mb-12">
-          <h2 className="text-3xl font-display text-center mb-8 text-white">
+        {/* Realm Selection with Images */}
+        <div className="max-w-7xl mx-auto mb-12">
+          <h2 className="text-3xl font-display text-center mb-2 text-white">
             Choose Your Realm
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {realms.map((realm) => (
-              <button
-                key={realm.name}
-                onClick={() => setSelectedRealm(realm.name)}
-                className={`
-                  relative p-8 rounded-lg border-2 transition-all duration-300
-                  bg-gradient-to-b ${realm.bgGradient}
-                  ${realm.borderColor}
-                  ${
-                    selectedRealm === realm.name
-                      ? 'scale-105 shadow-2xl'
-                      : 'hover:scale-102 opacity-80 hover:opacity-100'
-                  }
-                `}
-              >
-                <div className="text-center">
-                  <h3 className={`text-2xl font-display font-bold mb-3 ${realm.color}`}>
-                    {realm.title}
+          <p className="text-center text-purgatorio-mist mb-8">
+            Explore Dante's three realms and find your creative home
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Inferno Card */}
+            <Link
+              href="/gallery"
+              onClick={() => setSelectedRealm('INFERNO')}
+              className={`
+                group relative overflow-hidden rounded-xl transition-all duration-500
+                ${
+                  selectedRealm === 'INFERNO'
+                    ? 'scale-105 shadow-2xl ring-4 ring-paradiso-gold'
+                    : 'hover:scale-105 hover:shadow-2xl'
+                }
+              `}
+            >
+              <div className="aspect-[3/4] relative">
+                <Image
+                  src="/images/img1.png"
+                  alt="Inferno Realm"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <svg className="w-16 h-16 mb-2 text-paradiso-gold animate-flicker" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C12 2 7 6 7 11C7 14 9 16 12 16C15 16 17 14 17 11C17 6 12 2 12 2Z M12 14C11 14 10 13 10 11.5C10 9.5 12 7 12 7C12 7 14 9.5 14 11.5C14 13 13 14 12 14Z M8 18C8 18 6 19 6 20.5C6 21.9 7.1 23 8.5 23C9.9 23 11 21.9 11 20.5C11 19 9 18 9 18H8Z M15 18C15 18 13 19 13 20.5C13 21.9 14.1 23 15.5 23C16.9 23 18 21.9 18 20.5C18 19 16 18 16 18H15Z"/>
+                  </svg>
+                  <h3 className="text-3xl font-display font-bold mb-2 text-etched text-shadow-inferno">
+                    INFERNO
                   </h3>
-                  <p className="text-gray-400 text-sm">{realm.description}</p>
-                </div>
-                {selectedRealm === realm.name && (
-                  <div className="absolute top-2 right-2">
-                    <span className="text-2xl">✓</span>
+                  <p className="text-gray-300 text-sm mb-3">Realm of passion and raw creation</p>
+                  <div className="flex gap-2">
+                    <span className="badge-inferno text-xs">Dark Mode</span>
+                    <span className="badge-inferno text-xs">Fire FX</span>
                   </div>
-                )}
-              </button>
-            ))}
+                </div>
+              </div>
+            </Link>
+
+            {/* Purgatorio Card */}
+            <Link
+              href="/gallery"
+              onClick={() => setSelectedRealm('PURGATORIO')}
+              className={`
+                group relative overflow-hidden rounded-xl transition-all duration-500
+                ${
+                  selectedRealm === 'PURGATORIO'
+                    ? 'scale-105 shadow-2xl ring-4 ring-purgatorio-mist'
+                    : 'hover:scale-105 hover:shadow-2xl'
+                }
+              `}
+            >
+              <div className="aspect-[3/4] relative">
+                <Image
+                  src="/images/img10.png"
+                  alt="Purgatorio Realm"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <svg className="w-16 h-16 mb-2 text-purgatorio-mist animate-float" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M3 15C3 15 5 17 8 17C11 17 13 15 13 15M13 15C13 15 15 17 18 17C21 17 23 15 23 15M3 8C3 8 5 10 8 10C11 10 13 8 13 8M13 8C13 8 15 10 18 10C21 10 23 8 23 8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <h3 className="text-3xl font-display font-bold mb-2 text-ascend text-shadow-purgatorio">
+                    PURGATORIO
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-3">Realm of transformation and growth</p>
+                  <div className="flex gap-2">
+                    <span className="badge-purgatorio text-xs">Gradient</span>
+                    <span className="badge-purgatorio text-xs">Mist FX</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Paradiso Card */}
+            <Link
+              href="/gallery"
+              onClick={() => setSelectedRealm('PARADISO')}
+              className={`
+                group relative overflow-hidden rounded-xl transition-all duration-500
+                ${
+                  selectedRealm === 'PARADISO'
+                    ? 'scale-105 shadow-2xl ring-4 ring-paradiso-gold'
+                    : 'hover:scale-105 hover:shadow-2xl'
+                }
+              `}
+            >
+              <div className="aspect-[3/4] relative">
+                <Image
+                  src="/images/img17.png"
+                  alt="Paradiso Realm"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <svg className="w-16 h-16 mb-2 text-paradiso-gold animate-pulse-glow" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z M12 7L10.5 11L7 12.5L10.5 14L12 18L13.5 14L17 12.5L13.5 11L12 7Z"/>
+                  </svg>
+                  <h3 className="text-3xl font-display font-bold mb-2 text-divine text-shadow-paradiso">
+                    PARADISO
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-3">Realm of divine light and harmony</p>
+                  <div className="flex gap-2">
+                    <span className="badge-paradiso text-xs">Light Mode</span>
+                    <span className="badge-paradiso text-xs">Ray FX</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -250,14 +338,27 @@ export default function HomePage() {
         </div>
 
         {/* Featured Artists */}
-        <div className="max-w-7xl mx-auto mt-20">
-          <h2 className="text-3xl font-display text-center mb-4 text-paradiso-gold">
-            Featured Artists
-          </h2>
-          <p className="text-center text-purgatorio-mist mb-8">
-            Discover creators across the three realms
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="relative max-w-7xl mx-auto mt-20">
+          {/* Gate Background */}
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              backgroundImage: "url('/images/img7.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              animation: 'fadeInOut 8s ease-in-out infinite'
+            }}
+          />
+          
+          <div className="relative z-10">
+            <h2 className="text-3xl font-display text-center mb-4 text-paradiso-gold">
+              Featured Artists
+            </h2>
+            <p className="text-center text-purgatorio-mist mb-8">
+              Discover creators across the three realms
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 name: 'Luna Eclipse',
@@ -313,10 +414,14 @@ export default function HomePage() {
                 realmColor: 'text-paradiso-gold',
                 avatar: 'waves'
               }
-            ].map((artist) => (
+            ].map((artist, index) => (
               <div 
                 key={artist.name}
                 className="card-inferno cursor-pointer hover:scale-105 transition-all duration-300 hover:border-paradiso-gold"
+                style={{
+                  animation: `cardFadeInOut 12s ease-in-out infinite`,
+                  animationDelay: `${index * 1}s`
+                }}
               >
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-20 h-20 rounded-full bg-inferno-charcoal border-2 border-inferno-border flex items-center justify-center text-paradiso-gold">
@@ -373,24 +478,48 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex-1 bg-paradiso-gold hover:bg-paradiso-gold/80 text-black font-bold py-2 px-4 rounded transition-colors">
+                  <button className={`flex-1 font-bold py-2 px-4 rounded transition-colors ${
+                    index % 3 === 0 
+                      ? 'bg-paradiso-gold hover:bg-paradiso-gold/80 text-black'
+                      : index % 3 === 1
+                      ? 'bg-purgatorio-mist hover:bg-purgatorio-mist/80 text-black'
+                      : 'bg-gray-600 hover:bg-gray-500 text-white'
+                  }`}>
                     Follow
                   </button>
-                  <button className="border border-paradiso-gold hover:bg-paradiso-gold hover:text-black text-paradiso-gold font-bold py-2 px-4 rounded transition-colors">
+                  <button className={`border font-bold py-2 px-4 rounded transition-colors ${
+                    index % 3 === 0
+                      ? 'border-paradiso-gold hover:bg-paradiso-gold hover:text-black text-paradiso-gold'
+                      : index % 3 === 1
+                      ? 'border-purgatorio-mist hover:bg-purgatorio-mist hover:text-black text-purgatorio-mist'
+                      : 'border-gray-500 hover:bg-gray-500 hover:text-white text-gray-400'
+                  }`}>
                     Message
                   </button>
                 </div>
               </div>
             ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link
+                href="/browse"
+                className="text-paradiso-gold hover:text-white transition-colors underline text-lg"
+              >
+                Discover More Artists →
+              </Link>
+            </div>
           </div>
-          <div className="text-center mt-8">
-            <Link
-              href="/browse"
-              className="text-paradiso-gold hover:text-white transition-colors underline text-lg"
-            >
-              Discover More Artists →
-            </Link>
-          </div>
+          
+          {/* Card Fade Animation - Longer for dramatic gate opening */}
+          <style jsx>{`
+            @keyframes cardFadeInOut {
+              0% { opacity: 0.3; transform: scale(0.95); }
+              20% { opacity: 0.5; transform: scale(0.97); }
+              50% { opacity: 1; transform: scale(1); }
+              80% { opacity: 0.5; transform: scale(0.97); }
+              100% { opacity: 0.3; transform: scale(0.95); }
+            }
+          `}</style>
         </div>
 
         {/* Subscription Tiers */}
