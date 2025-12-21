@@ -55,7 +55,7 @@ export default function HomePage() {
         className="relative min-h-[600px] bg-cover bg-center bg-no-repeat flex flex-col justify-center items-center text-center px-4 py-24 border-b-2 border-inferno-border"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.75) 100%), url('/images/new-hero-img1.png')`,
-          backgroundPosition: 'center 30%'
+          backgroundPosition: 'center 40%'
         }}
       >
         {/* Dante Quote - Fades out */}
