@@ -5,7 +5,9 @@
  * All calculations are transparent, auditable, and fraud-resistant.
  */
 
-import { ArtistTier, SubscriptionTier } from '@prisma/client';
+// Types will be available after Prisma generation
+export type ArtistTier = 'EMERGING' | 'RISING' | 'ESTABLISHED' | 'FEATURED';
+export type SubscriptionTier = 'FREE' | 'INFERNO' | 'PURGATORIO' | 'PARADISO';
 
 // ============================================================================
 // CONFIGURATION
