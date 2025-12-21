@@ -1,5 +1,13 @@
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from '@mhc/common';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env files before checking environment variables
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+if (!process.env.JWT_SECRET) {
+  dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+}
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;

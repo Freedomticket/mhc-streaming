@@ -20,49 +20,177 @@
 @layer components {
   /* Realm-specific button styles */
   .btn-inferno {
-    @apply bg-gray-600 hover:bg-paradiso-gold hover:text-black text-white font-bold py-2 px-6 rounded-lg transition-all duration-200;
+    @apply bg-gray-600 hover:bg-paradiso-gold hover:text-black text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+    box-shadow: 0 4px 15px rgba(255, 50, 0, 0.2);
+  }
+  
+  .btn-inferno:active {
+    @apply scale-95;
   }
   
   .btn-purgatorio {
-    @apply bg-purgatorio-medium hover:bg-purgatorio-dark text-white font-bold py-2 px-6 rounded-lg transition-all duration-200;
+    @apply bg-purgatorio-medium hover:bg-purgatorio-dark text-white font-bold py-3 px-8 rounded-lg transition-all duration-300;
+    backdrop-filter: blur(10px);
+  }
+  
+  .btn-purgatorio:hover {
+    @apply transform -translate-y-1;
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
   }
   
   .btn-paradiso {
-    @apply bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-6 rounded-lg transition-all duration-200;
+    @apply bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded-lg transition-all duration-300;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  
+  .btn-paradiso:hover {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.3);
+  }
+  
+  /* Secondary buttons */
+  .btn-secondary-inferno {
+    @apply border-2 border-white/30 hover:border-paradiso-gold text-white hover:text-paradiso-gold font-semibold py-2 px-6 rounded-lg transition-all duration-300;
+  }
+  
+  .btn-secondary-purgatorio {
+    @apply border-2 border-purgatorio-mist hover:bg-purgatorio-mist/20 text-purgatorio-text font-semibold py-2 px-6 rounded-lg transition-all duration-300;
+  }
+  
+  .btn-secondary-paradiso {
+    @apply border-2 border-paradiso-silver hover:border-paradiso-gold text-paradiso-ink hover:text-paradiso-gold font-semibold py-2 px-6 rounded-lg transition-all duration-300;
   }
   
   /* Card styles */
   .card-inferno {
-    @apply bg-inferno-charcoal border border-inferno-border rounded-lg p-6 shadow-inferno;
+    @apply bg-inferno-charcoal border border-inferno-border rounded-lg p-6 shadow-inferno transition-all duration-300;
+  }
+  
+  .card-inferno:hover {
+    @apply border-white/20 transform -translate-y-1;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 50, 0, 0.2);
   }
   
   .card-purgatorio {
-    @apply bg-purgatorio-dark border border-purgatorio-medium rounded-lg p-6;
+    @apply bg-purgatorio-dark/80 border border-purgatorio-medium rounded-lg p-6 backdrop-blur-md transition-all duration-300;
+  }
+  
+  .card-purgatorio:hover {
+    @apply bg-purgatorio-dark border-purgatorio-mist transform -translate-y-2;
+    box-shadow: 0 10px 40px rgba(255, 255, 255, 0.15);
   }
   
   .card-paradiso {
-    @apply bg-paradiso-pearl border border-paradiso-silver rounded-lg p-6;
+    @apply bg-paradiso-pearl border border-paradiso-silver rounded-lg p-6 transition-all duration-300;
+  }
+  
+  .card-paradiso:hover {
+    @apply border-paradiso-gold;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 10px 40px rgba(0, 0, 0, 0.05);
   }
   
   /* Input styles */
   .input-base {
-    @apply w-full px-4 py-2 rounded-lg border bg-black/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all;
+    @apply w-full px-4 py-3 rounded-lg border bg-black/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-200;
   }
   
   .input-inferno {
-    @apply input-base border-inferno-border focus:ring-paradiso-gold;
+    @apply input-base border-inferno-border focus:ring-paradiso-gold focus:border-paradiso-gold;
+  }
+  
+  .input-inferno:focus {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
   }
   
   .input-purgatorio {
-    @apply input-base border-purgatorio-medium focus:ring-purgatorio-mist;
+    @apply input-base border-purgatorio-medium focus:ring-purgatorio-mist focus:border-purgatorio-mist;
+    backdrop-filter: blur(10px);
   }
   
   .input-paradiso {
-    @apply input-base border-paradiso-silver focus:ring-yellow-500;
+    @apply input-base bg-white/80 text-black placeholder-gray-400 border-paradiso-silver focus:ring-paradiso-gold focus:border-paradiso-gold;
+  }
+  
+  /* Textarea styles */
+  .textarea-inferno {
+    @apply input-inferno min-h-[120px] resize-y;
+  }
+  
+  .textarea-purgatorio {
+    @apply input-purgatorio min-h-[120px] resize-y;
+  }
+  
+  .textarea-paradiso {
+    @apply input-paradiso min-h-[120px] resize-y;
+  }
+  
+  /* Select styles */
+  .select-inferno {
+    @apply input-inferno cursor-pointer;
+  }
+  
+  .select-purgatorio {
+    @apply input-purgatorio cursor-pointer;
+  }
+  
+  .select-paradiso {
+    @apply input-paradiso cursor-pointer;
+  }
+  
+  /* Badge styles */
+  .badge-inferno {
+    @apply inline-block px-3 py-1 text-xs font-bold rounded-full bg-inferno-ash text-white border border-white/30;
+  }
+  
+  .badge-purgatorio {
+    @apply inline-block px-3 py-1 text-xs font-bold rounded-full bg-purgatorio-medium text-white;
+  }
+  
+  .badge-paradiso {
+    @apply inline-block px-3 py-1 text-xs font-bold rounded-full bg-paradiso-gold text-black;
+  }
+  
+  /* Link styles */
+  .link-inferno {
+    @apply text-white hover:text-paradiso-gold transition-colors duration-200 underline-offset-4 hover:underline;
+  }
+  
+  .link-purgatorio {
+    @apply text-purgatorio-text hover:text-purgatorio-mist transition-colors duration-200 underline-offset-4 hover:underline;
+  }
+  
+  .link-paradiso {
+    @apply text-paradiso-ink hover:text-paradiso-gold transition-colors duration-200 underline-offset-4 hover:underline;
+  }
+  
+  /* Container layouts */
+  .container-responsive {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .grid-gallery {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+  
+  .grid-masonry {
+    @apply columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6;
+  }
+  
+  /* Navigation styles */
+  .nav-inferno {
+    @apply bg-black/95 backdrop-blur-md border-b border-inferno-border;
+  }
+  
+  .nav-purgatorio {
+    @apply bg-purgatorio-dark/90 backdrop-blur-lg border-b border-purgatorio-medium;
+  }
+  
+  .nav-paradiso {
+    @apply bg-white/95 backdrop-blur-md border-b border-paradiso-silver;
   }
 }
 
 @layer utilities {
+  /* Animations */
   .animate-flicker {
     animation: flicker 3s ease-in-out infinite;
   }
@@ -75,11 +203,121 @@
     animation: orbit 30s linear infinite;
   }
   
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+  
+  /* Text shadows */
   .text-shadow-inferno {
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    text-shadow: 0 0 10px rgba(255, 50, 0, 0.5), 0 0 20px rgba(255, 0, 0, 0.3);
+  }
+  
+  .text-shadow-purgatorio {
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
   }
   
   .text-shadow-paradiso {
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.3);
+  }
+  
+  /* Glassmorphism */
+  .glass-inferno {
+    @apply bg-black/30 backdrop-blur-lg border border-white/10;
+  }
+  
+  .glass-purgatorio {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20;
+  }
+  
+  .glass-paradiso {
+    @apply bg-white/40 backdrop-blur-lg border border-white/30;
+  }
+  
+  /* Gradient text */
+  .gradient-text-inferno {
+    @apply bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent;
+  }
+  
+  .gradient-text-purgatorio {
+    @apply bg-gradient-to-b from-gray-800 via-gray-400 to-gray-200 bg-clip-text text-transparent;
+  }
+  
+  .gradient-text-paradiso {
+    @apply bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-200 bg-clip-text text-transparent;
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-2;
+  }
+  
+  .hover-glow-inferno {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-glow-inferno:hover {
+    filter: drop-shadow(0 0 20px rgba(255, 50, 0, 0.5));
+  }
+  
+  .hover-glow-paradiso {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-glow-paradiso:hover {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  }
+  
+  /* Scroll effects */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Aspect ratios */
+  .aspect-video-card {
+    aspect-ratio: 16 / 9;
+  }
+  
+  .aspect-square-card {
+    aspect-ratio: 1 / 1;
+  }
+  
+  .aspect-portrait-card {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+/* Additional keyframe animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
   }
 }

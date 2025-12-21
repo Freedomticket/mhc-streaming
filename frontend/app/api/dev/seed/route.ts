@@ -5,6 +5,11 @@ export async function POST() {
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ ok: false, error: 'DISABLED_IN_PROD' }, { status: 403 })
   }
+  
+  if (!prisma || typeof prisma.artist === 'undefined') {
+    return NextResponse.json({ ok: false, error: 'PRISMA_UNAVAILABLE' }, { status: 503 })
+  }
+  
   try {
     const slug = 'dante'
     let artist = await prisma.artist.findUnique({ where: { slug } })

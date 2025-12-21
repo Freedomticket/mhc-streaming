@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/app/lib/prisma'
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
+  if (!prisma || typeof prisma.galleryItem === 'undefined') {
+    return NextResponse.json({ ok: false, error: 'PRISMA_UNAVAILABLE' }, { status: 503 })
+  }
+  
   try {
     const body = await req.json()
     const item = await prisma.galleryItem.update({ where: { id: params.id }, data: body })
@@ -12,6 +16,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+  if (!prisma || typeof prisma.galleryItem === 'undefined') {
+    return NextResponse.json({ ok: false, error: 'PRISMA_UNAVAILABLE' }, { status: 503 })
+  }
+  
   try {
     await prisma.galleryItem.delete({ where: { id: params.id } })
     return NextResponse.json({ ok: true })

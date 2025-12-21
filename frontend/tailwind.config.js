@@ -50,9 +50,11 @@ module.exports = {
       fontFamily: {
         serif: ['Cinzel', 'Georgia', 'serif'],
         ui: ['Inter', 'system-ui', 'sans-serif'],
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'Courier New', 'monospace'],
+        inter: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['Courier New', 'monospace'],
         display: ['Cinzel', 'Georgia', 'serif'],
+        cinzel: ['Cinzel', 'Georgia', 'serif'],
       },
       fontSize: {
         'h1': ['48px', { lineHeight: '54px' }],
@@ -75,6 +77,12 @@ module.exports = {
         'orbit': 'orbit 30s linear infinite',
         'radiate': 'radiate 4s ease-in-out infinite',
         'reveal': 'reveal 0.5s ease-in-out',
+        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+        'ember-drift': 'ember-drift 15s ease-in-out infinite',
+        'mist-wave': 'mist-wave 10s ease-in-out infinite',
+        'divine-rotation': 'divine-rotation 40s linear infinite',
       },
       keyframes: {
         flicker: {
@@ -103,6 +111,40 @@ module.exports = {
           '0%': { clipPath: 'circle(0% at 50% 0%)' },
           '100%': { clipPath: 'circle(150% at 50% 0%)' },
         },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-100% 0' },
+          '100%': { backgroundPosition: '100% 0' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(255, 215, 0, 0.3)' },
+          '50%': { boxShadow: '0 0 40px rgba(255, 215, 0, 0.6)' },
+        },
+        'ember-drift': {
+          '0%, 100%': { opacity: 0.3, transform: 'scale(1) translateY(0)' },
+          '50%': { opacity: 0.6, transform: 'scale(1.1) translateY(-20px)' },
+        },
+        'mist-wave': {
+          '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
+          '50%': { transform: 'translateY(-30px)', opacity: 0.6 },
+        },
+        'divine-rotation': {
+          '0%': { transform: 'translateX(-50%) rotate(0deg)' },
+          '100%': { transform: 'translateX(-50%) rotate(360deg)' },
+        },
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      transitionDuration: {
+        '400': '400ms',
+        '600': '600ms',
+      },
+      scale: {
+        '102': '1.02',
       },
     },
   },

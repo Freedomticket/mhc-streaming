@@ -1,12 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter, Cinzel } from 'next/font/google'
-
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
-const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel' })
+import Header from './components/Header'
 
 export const metadata: Metadata = {
   title: 'MHC Streaming | Most High Creation',
@@ -22,8 +16,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cinzel.variable}`}>
-      <body className="min-h-screen bg-infernoDark text-white antialiased">
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Cinzel:wght@400..900&display=swap" rel="stylesheet" />
+      </head>
+      <body className="min-h-screen bg-infernoDark text-white antialiased font-inter">
+        <Header />
         {children}
       </body>
     </html>

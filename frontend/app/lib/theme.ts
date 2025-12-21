@@ -1,7 +1,7 @@
-export type Theme = 'INFERNO' | 'PURGATORIO' | 'PARADISO';
+export type Theme = 'INFERNO' | 'PURGATORIO' | 'PARADISO' | 'CUSTOM';
 
 export interface ThemeConfig {
-  name: Theme;
+  name: Theme | string;
   displayName: string;
   description: string;
   colors: {
@@ -21,6 +21,8 @@ export interface ThemeConfig {
     heading: string;
     body: string;
   };
+  isCustom?: boolean;
+  createdBy?: string;
 }
 
 export const THEME_CONFIG: Record<Theme, ThemeConfig> = {
@@ -96,13 +98,39 @@ export function getThemeConfig(theme: Theme): ThemeConfig {
   return THEME_CONFIG[theme];
 }
 
-export function getThemeStyles(theme: Theme) {
-  const config = THEME_CONFIG[theme];
+export function getThemeStyles(theme: Theme | ThemeConfig) {
+  const config = typeof theme === 'string' ? THEME_CONFIG[theme] : theme;
   return {
     container: `bg-gradient-to-b from-[${config.gradient.from}] to-[${config.gradient.to}]`,
     card: `border-2 border-[${config.colors.border}] bg-black/30`,
     heading: `text-[${config.colors.primary}] ${config.typography.heading}`,
     accent: `text-[${config.colors.accent}]`,
     button: `bg-[${config.colors.secondary}] hover:bg-[${config.colors.primary}] text-white`,
+  };
+}
+
+export function createCustomTheme(name: string, description: string, colors: Partial<ThemeConfig['colors']>, gradient?: Partial<ThemeConfig['gradient']>): ThemeConfig {
+  return {
+    name: `CUSTOM_${name.toUpperCase().replace(/\s+/g, '_')}`,
+    displayName: name,
+    description,
+    colors: {
+      primary: colors.primary || '#FFD700',
+      secondary: colors.secondary || '#CC9900',
+      background: colors.background || '#000000',
+      accent: colors.accent || '#FFFFFF',
+      text: colors.text || '#FFFFFF',
+      border: colors.border || '#333333',
+      overlay: colors.overlay || 'rgba(255, 215, 0, 0.1)',
+    },
+    gradient: {
+      from: gradient?.from || '#1a1a1a',
+      to: gradient?.to || '#000000',
+    },
+    typography: {
+      heading: 'font-bold',
+      body: 'font-normal',
+    },
+    isCustom: true,
   };
 }

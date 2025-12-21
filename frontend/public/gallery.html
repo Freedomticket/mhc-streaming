@@ -485,16 +485,16 @@
     <section class="controls-section">
         <div class="control-group">
             <input type="text" class="search-box" id="searchBox" placeholder="Search by canto or title...">
-            <button class="filter-btn active" onclick="filterArtworks('all')">All Realms</button>
-            <button class="filter-btn" onclick="filterArtworks('inferno')">Inferno</button>
-            <button class="filter-btn" onclick="filterArtworks('purgatorio')">Purgatorio</button>
-            <button class="filter-btn" onclick="filterArtworks('paradiso')">Paradiso</button>
+            <button class="filter-btn active" onclick="filterArtworks(event, 'all')">All Realms</button>
+            <button class="filter-btn" onclick="filterArtworks(event, 'inferno')">Inferno</button>
+            <button class="filter-btn" onclick="filterArtworks(event, 'purgatorio')">Purgatorio</button>
+            <button class="filter-btn" onclick="filterArtworks(event, 'paradiso')">Paradiso</button>
         </div>
         <div class="control-group">
-            <button class="view-btn active" onclick="changeView('grid')">Grid</button>
-            <button class="view-btn" onclick="changeView('masonry')">Masonry</button>
-            <button class="view-btn" onclick="changeView('two-column')">2-Col</button>
-            <button class="view-btn" onclick="changeView('four-column')">4-Col</button>
+            <button class="view-btn active" onclick="changeView(event, 'grid')">Grid</button>
+            <button class="view-btn" onclick="changeView(event, 'masonry')">Masonry</button>
+            <button class="view-btn" onclick="changeView(event, 'two-column')">2-Col</button>
+            <button class="view-btn" onclick="changeView(event, 'four-column')">4-Col</button>
         </div>
         <div class="control-group">
             <button class="theme-btn" onclick="showFavorites()">
@@ -624,14 +624,14 @@
             `).join('');
         }
 
-        function filterArtworks(realm) {
+        function filterArtworks(event, realm) {
             currentFilter = realm;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             renderGallery();
         }
 
-        function changeView(view) {
+        function changeView(event, view) {
             currentView = view;
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');

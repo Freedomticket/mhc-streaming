@@ -2,10 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import path from 'path';
 import authRoutes from './routes/auth';
 import { errorHandler } from './middleware/errorHandler';
 
-dotenv.config();
+// Load .env from service directory
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Fallback to root .env
+if (!process.env.JWT_SECRET) {
+  dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;

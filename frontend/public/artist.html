@@ -420,7 +420,7 @@
                 <p>Luna Eclipse is a visionary composer who blends classical orchestration with modern electronic sounds. Her groundbreaking "Echo of Eternity" album has captured audiences worldwide with its journey through Dante's Divine Comedy.</p>
                 <p><strong>Followers:</strong> 15.2K | <strong>Streams:</strong> 2.4M | <strong>Releases:</strong> 8</p>
                 <div class="featured-buttons">
-                    <button class="btn-primary" onclick="toggleFollow2(event)">Follow</button>
+                    <button class="btn-primary" onclick="toggleFollow(event)">Follow</button>
                     <button class="btn-primary" onclick="window.location='messages.html?artist=luna-eclipse'">Message</button>
                 </div>
             </div>
@@ -428,10 +428,10 @@
 
         <!-- Tab Navigation -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('all')">All Artists</button>
-            <button class="tab-btn" onclick="switchTab('inferno')">Inferno Realm</button>
-            <button class="tab-btn" onclick="switchTab('purgatorio')">Purgatorio Realm</button>
-            <button class="tab-btn" onclick="switchTab('paradiso')">Paradiso Realm</button>
+            <button class="tab-btn active" onclick="switchTab(event, 'all')">All Artists</button>
+            <button class="tab-btn" onclick="switchTab(event, 'inferno')">Inferno Realm</button>
+            <button class="tab-btn" onclick="switchTab(event, 'purgatorio')">Purgatorio Realm</button>
+            <button class="tab-btn" onclick="switchTab(event, 'paradiso')">Paradiso Realm</button>
         </div>
 
         <!-- All Artists Tab -->
@@ -757,7 +757,7 @@
     </footer>
 
     <script>
-        function switchTab(tabName) {
+        function switchTab(event, tabName) {
             const contents = document.querySelectorAll('.tab-content');
             const buttons = document.querySelectorAll('.tab-btn');
 
@@ -780,16 +780,6 @@
             }
         }
 
-        function toggleFollow2(event) {
-            const btn = event.target;
-            if (btn.classList.contains('following')) {
-                btn.classList.remove('following');
-                btn.textContent = 'Follow';
-            } else {
-                btn.classList.add('following');
-                btn.textContent = 'Following';
-            }
-        }
 
         function viewProfile(artistId) {
             window.location = 'profile.html?artist=' + artistId;
