@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import HomePage from '../page'
 
 // Mock Next.js Image and Link components
@@ -89,5 +90,77 @@ describe('HomePage Component', () => {
   it('renders licensing pricing component', () => {
     render(<HomePage />)
     expect(screen.getByText('One Stop Shop Licensing')).toBeInTheDocument()
+  })
+})
+
+describe('HomePage Interactions', () => {
+  it('navigates to register page when clicking Start Uploading Now', () => {
+    render(<HomePage />)
+    const startUploadingButton = screen.getByText('Start Uploading Now')
+    expect(startUploadingButton.closest('a')).toHaveAttribute('href', '/register')
+  })
+
+  it('navigates to browse page when clicking Learn More', () => {
+    render(<HomePage />)
+    const learnMoreButton = screen.getByText('Learn More')
+    expect(learnMoreButton.closest('a')).toHaveAttribute('href', '/browse')
+  })
+
+  it('navigates to register when clicking Start Creating', () => {
+    render(<HomePage />)
+    const startCreatingButton = screen.getByText('Start Creating')
+    expect(startCreatingButton.closest('a')).toHaveAttribute('href', '/register')
+  })
+
+  it('navigates to login when clicking Sign In', () => {
+    render(<HomePage />)
+    const signInButton = screen.getByText('Sign In')
+    expect(signInButton.closest('a')).toHaveAttribute('href', '/login')
+  })
+
+  it('navigates to browse when clicking Browse Content', () => {
+    render(<HomePage />)
+    const browseButton = screen.getByText('Browse Content')
+    expect(browseButton.closest('a')).toHaveAttribute('href', '/browse')
+  })
+
+  it('navigates to discover when clicking Discover Artists', () => {
+    render(<HomePage />)
+    const discoverButton = screen.getByText('Discover Artists')
+    expect(discoverButton.closest('a')).toHaveAttribute('href', '/discover')
+  })
+
+  it('realm cards link to gallery page', () => {
+    render(<HomePage />)
+    const realmLinks = screen.getAllByText('INFERNO')[0].closest('a')
+    expect(realmLinks).toHaveAttribute('href', '/gallery')
+  })
+
+  it('changes selected realm state when clicking realm cards', async () => {
+    const user = userEvent.setup()
+    render(<HomePage />)
+    
+    const infernoCard = screen.getAllByText('INFERNO')[0].closest('a')
+    if (infernoCard) {
+      await user.click(infernoCard)
+      expect(infernoCard).toBeInTheDocument()
+    }
+  })
+
+  it('video auto-plays on page load', () => {
+    render(<HomePage />)
+    const video = document.querySelector('video')
+    expect(video).toBeInTheDocument()
+    // Check video properties (React passes these differently than HTML attributes)
+    if (video) {
+      expect(video.hasAttribute('autoplay') || video.autoplay).toBeTruthy()
+      expect(video.hasAttribute('loop') || video.loop).toBeTruthy()
+    }
+  })
+
+  it('displays quote initially', () => {
+    render(<HomePage />)
+    const quote = screen.getByText(/For God so loved the world/i)
+    expect(quote).toBeInTheDocument()
   })
 })

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import LicensingPricing from '../LicensingPricing'
 
 describe('LicensingPricing Component', () => {
@@ -49,5 +50,70 @@ describe('LicensingPricing Component', () => {
     expect(screen.getByText('TV/Film licensing')).toBeInTheDocument()
     expect(screen.getByText('Major project licensing')).toBeInTheDocument()
     expect(screen.getByText('Dedicated support')).toBeInTheDocument()
+  })
+})
+
+describe('LicensingPricing Interactions', () => {
+  it('all CTA buttons are clickable', async () => {
+    const user = userEvent.setup()
+    render(<LicensingPricing />)
+    
+    const startBrowsingBtn = screen.getByText('Start Browsing')
+    const getBasicBtn = screen.getByText('Get Basic')
+    const goProBtn = screen.getByText('Go Pro')
+    const contactSalesBtn = screen.getByText('Contact Sales')
+    
+    await user.click(startBrowsingBtn)
+    await user.click(getBasicBtn)
+    await user.click(goProBtn)
+    await user.click(contactSalesBtn)
+    
+    // Verify buttons are still present after clicks (no navigation in test)
+    expect(startBrowsingBtn).toBeInTheDocument()
+    expect(getBasicBtn).toBeInTheDocument()
+    expect(goProBtn).toBeInTheDocument()
+    expect(contactSalesBtn).toBeInTheDocument()
+  })
+
+  it('Pro Tier button has special styling for most popular tier', () => {
+    render(<LicensingPricing />)
+    const goProBtn = screen.getByText('Go Pro')
+    const btnClasses = goProBtn.className
+    
+    // Pro tier should have gold background styling
+    expect(btnClasses).toContain('bg-paradiso-gold')
+  })
+
+  it('hover effects are applied to tier cards', () => {
+    render(<LicensingPricing />)
+    const tierCards = document.querySelectorAll('.card-inferno')
+    
+    tierCards.forEach(card => {
+      expect(card.className).toContain('hover:scale-105')
+    })
+  })
+
+  it('Pro Tier has special ring styling', () => {
+    render(<LicensingPricing />)
+    const proTierHeading = screen.getByText('Pro Tier')
+    const proTierCard = proTierHeading.closest('.card-inferno')
+    
+    if (proTierCard) {
+      const cardClasses = proTierCard.className
+      expect(cardClasses).toContain('ring-2')
+      expect(cardClasses).toContain('ring-paradiso-gold')
+    }
+  })
+
+  it('renders responsive grid layout', () => {
+    render(<LicensingPricing />)
+    const gridContainer = document.querySelector('.grid')
+    
+    expect(gridContainer).toBeInTheDocument()
+    if (gridContainer) {
+      expect(gridContainer.className).toContain('grid-cols-1')
+      expect(gridContainer.className).toContain('md:grid-cols-2')
+      expect(gridContainer.className).toContain('lg:grid-cols-4')
+    }
   })
 })
