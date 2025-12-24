@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import LicensingPricing from '../components/LicensingPricing'
 
 type Realm = 'INFERNO' | 'PURGATORIO' | 'PARADISO'
 
@@ -94,8 +95,11 @@ export default function HomePage() {
         <h1 className="text-4xl md:text-6xl font-display font-bold mb-4">
           <span className="text-white">YOUR MUSIC. YOUR PLATFORM. YOUR FUTURE.</span>
         </h1>
-        <p className="text-lg md:text-xl text-purgatorio-mist mb-6 max-w-3xl">
+        <p className="text-lg md:text-xl text-purgatorio-mist mb-4 max-w-3xl">
           The independent artist ecosystem where you own everything, earn everything, and never answer to gatekeepers
+        </p>
+        <p className="text-md text-paradiso-gold mb-6 font-semibold">
+          For Indie Artists - A Platform for Connectivity, not Just Streams!
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/register" className="btn-inferno px-8 py-3 text-lg">
@@ -593,6 +597,9 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* Licensing Pricing Section */}
+        <LicensingPricing />
       </div>
 
       {/* Footer */}
