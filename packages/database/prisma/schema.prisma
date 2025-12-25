@@ -52,6 +52,8 @@ enum RoyaltyType {
   STREAM
   DOWNLOAD
   SUBSCRIPTION_SHARE
+  LICENSE_REVENUE // From production house subscriptions
+  ISM_PRIORITY // ISM priority artist fund
   TIP
   PREMIUM_ACCESS
 }
@@ -65,10 +67,17 @@ enum RoyaltyStatus {
 }
 
 enum ArtistTier {
-  EMERGING      // New artists, 1x multiplier
-  RISING        // Growing artists, 1.2x multiplier
-  ESTABLISHED   // Popular artists, 1.5x multiplier
-  FEATURED      // Featured like ISM, 2x multiplier
+  EMERGING // New artists, 1x multiplier
+  RISING // Growing artists, 1.1x multiplier
+  ESTABLISHED // Popular artists, 1.25x multiplier
+  LEGENDARY // Top tier, 1.5x multiplier
+}
+
+enum TreasuryFundType {
+  OPERATIONS // Platform infrastructure & operations (30%)
+  ISM_PRIORITY // ISM priority artist fund (10%)
+  GOVERNANCE // DAO governance treasury (5%)
+  AI_DEVELOPMENT // AI improvement fund (5%)
 }
 
 model User {
@@ -81,56 +90,56 @@ model User {
   passwordHash  String?
   role          UserRole @default(USER)
   emailVerified Boolean  @default(false)
-  
+
   // Social auth
-  googleId      String?  @unique
-  twitterId     String?  @unique
-  discordId     String?  @unique
-  
+  googleId  String? @unique
+  twitterId String? @unique
+  discordId String? @unique
+
   // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  lastLoginAt   DateTime?
-  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
   // Relations
-  subscription  Subscription?
-  streams       Stream[]
-  videos        Video[]
-  views         View[]
-  payments      Payment[]
-  followers     Follow[] @relation("Following")
-  following     Follow[] @relation("Followers")
-  streamEvents  StreamEvent[]
-  
+  subscription Subscription?
+  streams      Stream[]
+  videos       Video[]
+  views        View[]
+  payments     Payment[]
+  followers    Follow[]      @relation("Following")
+  following    Follow[]      @relation("Followers")
+  streamEvents StreamEvent[]
+
   @@index([email])
   @@index([username])
 }
 
 model Subscription {
-  id          String             @id @default(cuid())
-  userId      String             @unique
-  tier        SubscriptionTier   @default(FREE)
-  status      SubscriptionStatus @default(ACTIVE)
-  
+  id     String             @id @default(cuid())
+  userId String             @unique
+  tier   SubscriptionTier   @default(FREE)
+  status SubscriptionStatus @default(ACTIVE)
+
   // Pricing
-  priceId     String?
-  amount      Int?               // In cents
-  currency    String?            @default("USD")
-  
+  priceId  String?
+  amount   Int? // In cents
+  currency String? @default("USD")
+
   // Billing
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
-  cancelAtPeriodEnd  Boolean    @default(false)
-  
+  cancelAtPeriodEnd  Boolean   @default(false)
+
   // Payment provider
-  stripeCustomerId      String?  @unique
-  stripeSubscriptionId  String?  @unique
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([status])
 }
@@ -140,91 +149,91 @@ model Follow {
   followerId  String
   followingId String
   createdAt   DateTime @default(now())
-  
-  follower    User     @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
-  
+
+  follower  User @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
   @@unique([followerId, followingId])
   @@index([followerId])
   @@index([followingId])
 }
 
 model Stream {
-  id           String       @id @default(cuid())
-  title        String
-  description  String?
-  thumbnail    String?
-  status       StreamStatus @default(SCHEDULED)
-  
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  thumbnail   String?
+  status      StreamStatus @default(SCHEDULED)
+
   // Streaming info
-  streamKey    String       @unique
-  rtmpUrl      String?
-  hlsUrl       String?
-  
+  streamKey String  @unique
+  rtmpUrl   String?
+  hlsUrl    String?
+
   // Scheduling
   scheduledFor DateTime?
   startedAt    DateTime?
   endedAt      DateTime?
-  
+
   // Stats
-  viewCount    Int          @default(0)
-  peakViewers  Int          @default(0)
-  
+  viewCount   Int @default(0)
+  peakViewers Int @default(0)
+
   // Access control
-  isPremium    Boolean      @default(false)
+  isPremium    Boolean           @default(false)
   requiredTier SubscriptionTier?
-  
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   userId       String
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   views        View[]
   streamEvents StreamEvent[]
-  
+
   @@index([userId])
   @@index([status])
   @@index([scheduledFor])
 }
 
 model Video {
-  id           String      @id @default(cuid())
-  title        String
-  description  String?
-  thumbnail    String?
-  status       VideoStatus @default(UPLOADING)
-  
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  thumbnail   String?
+  status      VideoStatus @default(UPLOADING)
+
   // Video files
   originalUrl  String?
   processedUrl String?
-  duration     Int?        // In seconds
-  fileSize     Int?        // In bytes
-  
+  duration     Int? // In seconds
+  fileSize     Int? // In bytes
+
   // Industry identifiers (if artist uploaded)
-  iswc         String?     // Musical work code
-  isrc         String?     // Recording code
-  artistId     String?     // Link to Artist if applicable
-  
+  iswc     String? // Musical work code
+  isrc     String? // Recording code
+  artistId String? // Link to Artist if applicable
+
   // Stats
-  viewCount    Int         @default(0)
-  likeCount    Int         @default(0)
-  streamCount  Int         @default(0) // Qualified streams (>30s)
-  
+  viewCount   Int @default(0)
+  likeCount   Int @default(0)
+  streamCount Int @default(0) // Qualified streams (>30s)
+
   // Access control
-  isPremium    Boolean     @default(false)
+  isPremium    Boolean           @default(false)
   requiredTier SubscriptionTier?
-  
+
   // Publishing
-  publishedAt  DateTime?
-  
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   userId       String
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   views        View[]
   streamEvents StreamEvent[]
-  
+
   @@index([userId])
   @@index([artistId])
   @@index([status])
@@ -234,22 +243,22 @@ model Video {
 }
 
 model View {
-  id         String   @id @default(cuid())
-  duration   Int      @default(0) // Seconds watched
-  completed  Boolean  @default(false)
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  streamId   String?
-  stream     Stream?  @relation(fields: [streamId], references: [id], onDelete: Cascade)
-  
-  videoId    String?
-  video      Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  
+  id        String  @id @default(cuid())
+  duration  Int     @default(0) // Seconds watched
+  completed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  streamId String?
+  stream   Stream? @relation(fields: [streamId], references: [id], onDelete: Cascade)
+
+  videoId String?
+  video   Video?  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([streamId])
   @@index([videoId])
@@ -257,81 +266,82 @@ model View {
 }
 
 model Payment {
-  id              String        @id @default(cuid())
-  amount          Int           // In cents
-  currency        String        @default("USD")
-  status          PaymentStatus @default(PENDING)
-  
+  id       String        @id @default(cuid())
+  amount   Int // In cents
+  currency String        @default("USD")
+  status   PaymentStatus @default(PENDING)
+
   // Payment provider
-  stripePaymentId String?       @unique
-  
+  stripePaymentId String? @unique
+
   // Metadata
-  description     String?
-  metadata        Json?
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
-  userId          String
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  description String?
+  metadata    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([status])
   @@index([createdAt])
 }
 
 model Analytics {
-  id        String   @id @default(cuid())
-  date      DateTime @default(now())
-  
+  id   String   @id @default(cuid())
+  date DateTime @default(now())
+
   // Metrics
-  metric    String
-  value     Float
-  metadata  Json?
-  
+  metric   String
+  value    Float
+  metadata Json?
+
   createdAt DateTime @default(now())
-  
+
   @@index([metric, date])
   @@index([date])
 }
 
 model Artist {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String        @unique
-  bio         String?
-  theme       String        @default("INFERNO")
-  
+  id    String  @id @default(cuid())
+  name  String
+  slug  String  @unique
+  bio   String?
+  theme String  @default("INFERNO")
+
   // Industry identifiers for rights management
-  iswc        String?       @unique // International Standard Musical Work Code (composition)
-  isrc        String?       @unique // International Standard Recording Code (recording)
-  ipi         String?       @unique // Interested Party Information (rightsholder)
-  ipn         String?       @unique // International Performer Number (performer)
-  isni        String?       @unique // International Standard Name Identifier (public entity)
-  
+  iswc String? @unique // International Standard Musical Work Code (composition)
+  isrc String? @unique // International Standard Recording Code (recording)
+  ipi  String? @unique // Interested Party Information (rightsholder)
+  ipn  String? @unique // International Performer Number (performer)
+  isni String? @unique // International Standard Name Identifier (public entity)
+
   // Royalty & payment info
-  tier        ArtistTier    @default(EMERGING)
-  paypalEmail String?       // For automated payouts
-  bankAccount String?       // Encrypted bank details
-  minPayout   Int           @default(5000) // Minimum payout threshold in cents ($50)
-  
+  tier        ArtistTier @default(EMERGING)
+  paypalEmail String? // For automated payouts
+  bankAccount String? // Encrypted bank details
+  minPayout   Int        @default(5000) // Minimum payout threshold in cents ($50)
+
   // Stats
-  totalStreams     Int      @default(0)
-  totalEarnings    Int      @default(0) // In cents, all-time
-  lifetimeRoyalties Float   @default(0) // Total paid out
-  
+  totalStreams      Int   @default(0)
+  totalEarnings     Int   @default(0) // In cents, all-time
+  lifetimeRoyalties Float @default(0) // Total paid out
+
   // Featured artist flag
-  isFeatured  Boolean       @default(false)
-  featuredAt  DateTime?
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
-  galleryItems   GalleryItem[]
-  streamEvents   StreamEvent[]
-  royalties      Royalty[]
-  payouts        RoyaltyPayout[]
-  
+  isFeatured Boolean   @default(false)
+  featuredAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  galleryItems GalleryItem[]
+  streamEvents StreamEvent[]
+  royalties    Royalty[]
+  payouts      RoyaltyPayout[]
+  ismPriority  IsmPriorityArtist? // ISM priority status
+
   @@index([slug])
   @@index([iswc])
   @@index([isrc])
@@ -340,59 +350,59 @@ model Artist {
 }
 
 model GalleryItem {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   artistId    String
   title       String
   description String?
   image       String
-  order       Int      @default(0)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  artist      Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  
+  order       Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
   @@index([artistId])
   @@index([order])
 }
 
 // Tracks every stream/play event for royalty calculation
 model StreamEvent {
-  id            String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // What was played
-  videoId       String?
-  video         Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  
-  streamId      String?
-  stream        Stream?  @relation(fields: [streamId], references: [id], onDelete: Cascade)
-  
+  videoId String?
+  video   Video?  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  streamId String?
+  stream   Stream? @relation(fields: [streamId], references: [id], onDelete: Cascade)
+
   // Artist attribution
-  artistId      String
-  artist        Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  
+  artistId String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
   // Who watched
-  userId        String?
-  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   // Stream quality metrics
-  duration      Int      // Seconds watched
-  completed     Boolean  @default(false) // Watched >80%
-  qualified     Boolean  @default(false) // Watched >30s (counts for royalty)
-  
+  duration  Int // Seconds watched
+  completed Boolean @default(false) // Watched >80%
+  qualified Boolean @default(false) // Watched >30s (counts for royalty)
+
   // Revenue attribution
-  revenueShare  Float    @default(0) // Fraction of revenue pool (calculated later)
-  userTier      SubscriptionTier? // User's subscription tier at time of stream
-  
+  revenueShare Float             @default(0) // Fraction of revenue pool (calculated later)
+  userTier     SubscriptionTier? // User's subscription tier at time of stream
+
   // Fraud detection
-  ipAddress     String?
-  userAgent     String?
-  fraudScore    Float    @default(0) // 0-1, higher = more suspicious
-  
+  ipAddress  String?
+  userAgent  String?
+  fraudScore Float   @default(0) // 0-1, higher = more suspicious
+
   // Metadata
-  timestamp     DateTime @default(now())
-  processedAt   DateTime? // When royalty was calculated
-  
+  timestamp   DateTime  @default(now())
+  processedAt DateTime? // When royalty was calculated
+
   @@index([artistId])
   @@index([videoId])
   @@index([streamId])
@@ -404,47 +414,47 @@ model StreamEvent {
 
 // Aggregated royalty records per artist per period
 model Royalty {
-  id              String        @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Artist
-  artistId        String
-  artist          Artist        @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  
+  artistId String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
   // Period
-  periodStart     DateTime
-  periodEnd       DateTime
-  
+  periodStart DateTime
+  periodEnd   DateTime
+
   // Calculation metrics
-  streamCount     Int           @default(0) // Qualified streams in period
-  totalStreams    Int           @default(0) // Platform-wide streams in period
-  revenuePool     Int           @default(0) // Total revenue to distribute (cents)
-  
+  streamCount  Int @default(0) // Qualified streams in period
+  totalStreams Int @default(0) // Platform-wide streams in period
+  revenuePool  Int @default(0) // Total revenue to distribute (cents)
+
   // Royalty calculation
-  type            RoyaltyType   @default(STREAM)
-  baseAmount      Int           @default(0) // Before multipliers (cents)
-  tierMultiplier  Float         @default(1.0) // Artist tier bonus
-  finalAmount     Int           @default(0) // After multipliers (cents)
-  
+  type           RoyaltyType @default(STREAM)
+  baseAmount     Int         @default(0) // Before multipliers (cents)
+  tierMultiplier Float       @default(1.0) // Artist tier bonus
+  finalAmount    Int         @default(0) // After multipliers (cents)
+
   // Status
-  status          RoyaltyStatus @default(PENDING)
-  calculatedAt    DateTime?
-  
+  status       RoyaltyStatus @default(PENDING)
+  calculatedAt DateTime?
+
   // Fraud & quality
-  fraudStreams    Int           @default(0) // Detected fraudulent streams
-  adjustedAmount  Int           @default(0) // After fraud deduction
-  
+  fraudStreams   Int @default(0) // Detected fraudulent streams
+  adjustedAmount Int @default(0) // After fraud deduction
+
   // Identifiers for tracking
-  iswc            String?
-  isrc            String?
-  
+  iswc String?
+  isrc String?
+
   // Metadata
-  metadata        Json?         // Additional calculation details
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
-  payoutItems     RoyaltyPayoutItem[]
-  
+  metadata Json? // Additional calculation details
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payoutItems RoyaltyPayoutItem[]
+
   @@unique([artistId, periodStart, periodEnd, type])
   @@index([artistId])
   @@index([status])
@@ -455,36 +465,36 @@ model Royalty {
 
 // Actual payouts sent to artists
 model RoyaltyPayout {
-  id              String        @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Artist
-  artistId        String
-  artist          Artist        @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  
+  artistId String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
   // Payout details
-  amount          Int           // Total amount in cents
-  currency        String        @default("USD")
-  status          PaymentStatus @default(PENDING)
-  
+  amount   Int // Total amount in cents
+  currency String        @default("USD")
+  status   PaymentStatus @default(PENDING)
+
   // Payment method
-  paymentMethod   String?       // "paypal", "bank_transfer", "crypto"
-  paymentEmail    String?       // PayPal email or similar
-  transactionId   String?       @unique // External payment ID
-  
+  paymentMethod String? // "paypal", "bank_transfer", "crypto"
+  paymentEmail  String? // PayPal email or similar
+  transactionId String? @unique // External payment ID
+
   // Timing
-  scheduledFor    DateTime      // When payout should execute
-  processedAt     DateTime?     // When actually sent
-  
+  scheduledFor DateTime // When payout should execute
+  processedAt  DateTime? // When actually sent
+
   // Metadata
-  metadata        Json?         // Additional payout details
-  failureReason   String?       // If failed
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
+  metadata      Json? // Additional payout details
+  failureReason String? // If failed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  payoutItems     RoyaltyPayoutItem[]
-  
+  payoutItems RoyaltyPayoutItem[]
+
   @@index([artistId])
   @@index([status])
   @@index([scheduledFor])
@@ -493,16 +503,16 @@ model RoyaltyPayout {
 
 // Join table for many-to-many between Royalty and RoyaltyPayout
 model RoyaltyPayoutItem {
-  id            String        @id @default(cuid())
-  
-  royaltyId     String
-  royalty       Royalty       @relation(fields: [royaltyId], references: [id], onDelete: Cascade)
-  
-  payoutId      String
-  payout        RoyaltyPayout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
-  
-  createdAt     DateTime      @default(now())
-  
+  id String @id @default(cuid())
+
+  royaltyId String
+  royalty   Royalty @relation(fields: [royaltyId], references: [id], onDelete: Cascade)
+
+  payoutId String
+  payout   RoyaltyPayout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
   @@unique([royaltyId, payoutId])
   @@index([royaltyId])
   @@index([payoutId])
@@ -512,17 +522,17 @@ model RoyaltyPayoutItem {
 
 // User interactions for recommendation engine
 model UserInteraction {
-  id              String   @id @default(cuid())
-  userId          String
-  contentId       String
-  contentType     String   // 'video', 'audio', 'stream'
-  action          String   // 'view', 'like', 'skip', 'complete', 'share'
-  watchTime       Int?     // Seconds watched
-  totalDuration   Int?     // Total content duration
-  completionRate  Float?   // watchTime / totalDuration
-  
-  createdAt       DateTime @default(now())
-  
+  id             String @id @default(cuid())
+  userId         String
+  contentId      String
+  contentType    String // 'video', 'audio', 'stream'
+  action         String // 'view', 'like', 'skip', 'complete', 'share'
+  watchTime      Int? // Seconds watched
+  totalDuration  Int? // Total content duration
+  completionRate Float? // watchTime / totalDuration
+
+  createdAt DateTime @default(now())
+
   @@index([userId])
   @@index([contentId])
   @@index([action])
@@ -532,19 +542,19 @@ model UserInteraction {
 // Generic content model for AI recommendations
 model Content {
   id          String   @id @default(cuid())
-  userId      String   // Creator
+  userId      String // Creator
   title       String
   description String?
   category    String?
   tags        String[] @default([])
-  danteRealm  String?  // 'inferno', 'purgatorio', 'paradiso'
+  danteRealm  String? // 'inferno', 'purgatorio', 'paradiso'
   isPublic    Boolean  @default(true)
   views       Int      @default(0)
   likes       Int      @default(0)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([category])
   @@index([isPublic])
@@ -553,28 +563,28 @@ model Content {
 
 // Blocked content for moderation
 model BlockedContent {
-  id        String   @id @default(cuid())
-  type      String   // 'hash' or 'keyword'
-  value     String
-  reason    String?
-  
+  id     String  @id @default(cuid())
+  type   String // 'hash' or 'keyword'
+  value  String
+  reason String?
+
   createdAt DateTime @default(now())
-  
+
   @@unique([type, value])
   @@index([type])
 }
 
 // Content reports from users
 model ContentReport {
-  id          String   @id @default(cuid())
-  contentId   String
-  reporterId  String
-  reason      String
-  status      String   @default("pending") // 'pending', 'reviewed', 'actioned'
-  
-  createdAt   DateTime @default(now())
-  reviewedAt  DateTime?
-  
+  id         String @id @default(cuid())
+  contentId  String
+  reporterId String
+  reason     String
+  status     String @default("pending") // 'pending', 'reviewed', 'actioned'
+
+  createdAt  DateTime  @default(now())
+  reviewedAt DateTime?
+
   @@index([contentId])
   @@index([reporterId])
   @@index([status])
@@ -582,16 +592,16 @@ model ContentReport {
 
 // Moderation queue for human review
 model ModerationQueue {
-  id        String   @id @default(cuid())
-  contentId String
-  reason    String
-  priority  String   @default("medium") // 'low', 'medium', 'high', 'critical'
-  status    String   @default("pending") // 'pending', 'in_review', 'completed'
+  id         String  @id @default(cuid())
+  contentId  String
+  reason     String
+  priority   String  @default("medium") // 'low', 'medium', 'high', 'critical'
+  status     String  @default("pending") // 'pending', 'in_review', 'completed'
   reviewerId String?
-  
-  createdAt  DateTime @default(now())
+
+  createdAt  DateTime  @default(now())
   reviewedAt DateTime?
-  
+
   @@index([contentId])
   @@index([status])
   @@index([priority])
@@ -599,16 +609,205 @@ model ModerationQueue {
 
 // Stream analytics for AI service
 model StreamAnalytics {
-  id           String   @id @default(cuid())
-  streamId     String
-  userId       String   // Stream creator
-  duration     Int      // Stream duration in seconds
-  peakViewers  Int
-  totalViews   Int
-  
-  createdAt    DateTime @default(now())
-  
+  id          String @id @default(cuid())
+  streamId    String
+  userId      String // Stream creator
+  duration    Int // Stream duration in seconds
+  peakViewers Int
+  totalViews  Int
+
+  createdAt DateTime @default(now())
+
   @@index([streamId])
   @@index([userId])
   @@index([createdAt])
+}
+
+// ============ SUSTAINABLE TREASURY SYSTEM ============
+
+// License revenue from production house subscriptions
+model LicenseRevenue {
+  id String @id @default(cuid())
+
+  // Subscription info
+  subscriptionId String // From Stripe/PayPal
+  userId         String? // Production house user
+  tier           String // "Basic" ($99) or "Pro" ($499)
+  amount         Int // Total amount in cents
+
+  // Revenue allocation (all in cents) - totals to 100%
+  platformOps    Int // 30% - infrastructure, servers, bandwidth
+  ismFund        Int // 10% - ISM priority artists only
+  governanceFund Int // 5% - DAO governance treasury
+  aiFund         Int // 5% - AI development & improvements
+  artistPool     Int // 50% - distributed to all active artists
+
+  // Period tracking
+  periodStart  DateTime
+  periodEnd    DateTime
+  billingMonth DateTime // First day of billing month
+
+  // Processing status
+  processed   Boolean   @default(false)
+  processedAt DateTime?
+
+  // Metadata
+  metadata Json? // Additional billing details
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([processed])
+  @@index([billingMonth])
+  @@index([tier])
+  @@index([subscriptionId])
+}
+
+// Platform treasury fund balances
+model PlatformTreasury {
+  id String @id @default(cuid())
+
+  // Fund type
+  fundType TreasuryFundType
+
+  // Balances (all in cents)
+  balance       Int @default(0) // Current available balance
+  totalReceived Int @default(0) // Lifetime received
+  totalSpent    Int @default(0) // Lifetime spent
+  reserved      Int @default(0) // Reserved for pending expenses
+
+  // Period tracking
+  month DateTime // First day of month
+
+  // Auto-calculated metrics
+  monthlyIncome  Int   @default(0) // Income this month
+  monthlyExpense Int   @default(0) // Expenses this month
+  burnRate       Float @default(0) // Monthly spend rate
+
+  // Status
+  isHealthy      Boolean  @default(true) // Balance sufficient?
+  lastCalculated DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses TreasuryExpense[]
+
+  @@unique([fundType, month])
+  @@index([fundType])
+  @@index([month])
+  @@index([isHealthy])
+}
+
+// Track treasury expenses for transparency
+model TreasuryExpense {
+  id String @id @default(cuid())
+
+  treasuryId String
+  treasury   PlatformTreasury @relation(fields: [treasuryId], references: [id], onDelete: Cascade)
+
+  // Expense details
+  category    String // "servers", "storage", "bandwidth", "ai", "development"
+  description String
+  amount      Int // In cents
+
+  // Approval & status
+  status     String    @default("pending") // "pending", "approved", "paid", "rejected"
+  approvedBy String? // Admin/DAO approval
+  approvedAt DateTime?
+
+  // Payment tracking
+  paidAt        DateTime?
+  transactionId String? // External payment reference
+
+  // Metadata
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([treasuryId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+}
+
+// ISM Priority Artist registry
+model IsmPriorityArtist {
+  id String @id @default(cuid())
+
+  artistId String @unique
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  // ISM designation
+  ismVerified   Boolean @default(true)
+  priorityLevel Int     @default(1) // 1-5, higher = larger revenue share
+
+  // Eligibility criteria
+  minUploads Int   @default(5) // Must have 5+ quality tracks
+  minQuality Float @default(0.8) // Quality score 0-1
+  minStreams Int   @default(1000) // Min 1000 qualified streams
+
+  // Auto-promotion tracking
+  autoPromoted   Boolean @default(false) // Promoted by system?
+  manualOverride Boolean @default(false) // Manual admin designation?
+
+  // Status
+  active       Boolean @default(true)
+  pausedReason String? // Why paused if inactive
+
+  // Timestamps
+  addedAt        DateTime  @default(now())
+  removedAt      DateTime?
+  lastReviewedAt DateTime  @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+  @@index([priorityLevel])
+  @@index([ismVerified])
+  @@index([autoPromoted])
+}
+
+// Revenue distribution tracking
+model RevenueDistribution {
+  id String @id @default(cuid())
+
+  // Period
+  periodStart DateTime
+  periodEnd   DateTime
+  month       DateTime // First day of month
+
+  // Total license revenue collected
+  totalRevenue Int @default(0) // Total from all subscriptions
+
+  // Fund allocations (in cents)
+  platformOps    Int @default(0) // 30%
+  ismFund        Int @default(0) // 10%
+  governanceFund Int @default(0) // 5%
+  aiFund         Int @default(0) // 5%
+  artistPool     Int @default(0) // 50%
+
+  // Distribution metrics
+  totalArtists   Int @default(0) // Artists who received payment
+  ismArtists     Int @default(0) // ISM priority artists
+  avgArtistShare Int @default(0) // Average per artist (cents)
+
+  // Status
+  calculated    Boolean   @default(false)
+  distributed   Boolean   @default(false)
+  calculatedAt  DateTime?
+  distributedAt DateTime?
+
+  // Metadata
+  metadata Json? // Additional distribution details
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([month])
+  @@index([calculated])
+  @@index([distributed])
+  @@index([month])
 }
