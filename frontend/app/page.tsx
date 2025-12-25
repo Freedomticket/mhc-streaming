@@ -607,6 +607,19 @@ export default function HomePage() {
         <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
           <p>&copy; 2025 Most High Creation Streaming. All rights reserved.</p>
           <p className="mt-2">Artist-first • Decentralized • Dante-inspired</p>
+          <div className="mt-4 flex justify-center gap-4">
+            <Link href="/terms" className="text-paradiso-gold hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+            <span>•</span>
+            <Link href="/privacy" className="text-paradiso-gold hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <span>•</span>
+            <a href="mailto:support@mhclicensing.com" className="text-paradiso-gold hover:text-white transition-colors">
+              Contact Support
+            </a>
+          </div>
         </div>
       </footer>
     </main>
