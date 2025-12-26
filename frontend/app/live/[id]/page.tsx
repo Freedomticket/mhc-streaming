@@ -100,13 +100,13 @@ export default function LiveStreamPage({ params }: { params: { id: string } }) {
 
           {/* Video Player */}
           <div className="mb-6">
-            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl flex items-center justify-center">
               {stream.status === 'LIVE' ? (
                 <video
                   ref={videoRef}
                   controls
                   autoPlay
-                  className="w-full h-full"
+                  className="w-full h-full object-contain object-center"
                 >
                   {/* HLS stream would go here */}
                   <p className="text-center text-white p-8">

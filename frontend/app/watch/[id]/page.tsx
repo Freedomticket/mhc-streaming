@@ -98,10 +98,10 @@ export default function WatchPage({ params }: { params: { id: string } }) {
         <div className="max-w-6xl mx-auto">
           {/* Video Player */}
           <div className="mb-6">
-            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl flex items-center justify-center">
               <video
                 controls
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain object-center"
                 poster={video.thumbnailUrl}
               >
                 <source src={video.videoUrl} type="video/mp4" />

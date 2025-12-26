@@ -129,9 +129,11 @@ export default function GalleryPage() {
         {/* Gallery Grid */}
         <div className="grid-gallery">
           {filteredItems.map((item) => (
-            <div
+            <Link
               key={item.id}
-              className={`card-inferno hover-lift group cursor-pointer overflow-hidden`}
+              href={item.imagePath}
+              target="_blank"
+              className={`card-inferno hover-lift group overflow-hidden`}
             >
               {/* Image */}
               <div className="aspect-square-card relative overflow-hidden rounded-lg mb-4 bg-inferno-ash">
@@ -167,7 +169,7 @@ export default function GalleryPage() {
                   {item.description}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

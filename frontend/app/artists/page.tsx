@@ -209,14 +209,14 @@ export default function ArtistsPage() {
 
               {/* Action Buttons */}
               <div className="flex gap-2">
-                <button className="flex-1 bg-paradiso-gold hover:bg-paradiso-gold/80 text-black font-bold py-2 px-4 rounded transition-colors">
+                <Link href="/login" className="flex-1 bg-paradiso-gold hover:bg-paradiso-gold/80 text-black font-bold py-2 px-4 rounded text-center transition-colors">
                   Follow
-                </button>
-                <button className="border border-paradiso-gold hover:bg-paradiso-gold hover:text-black text-paradiso-gold font-bold py-2 px-4 rounded transition-colors">
+                </Link>
+                <Link href="/login" className="border border-paradiso-gold hover:bg-paradiso-gold hover:text-black text-paradiso-gold font-bold py-2 px-4 rounded transition-colors" aria-label="Message">
                   <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M8 12h8M12 8v8" strokeLinecap="round" />
                   </svg>
-                </button>
+                </Link>
               </div>
             </Link>
           ))}

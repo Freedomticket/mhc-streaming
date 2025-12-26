@@ -75,14 +75,14 @@ export default function HomePage() {
 
         {/* Video Placeholder - Fades in */}
         <div 
-          className="relative w-full max-w-4xl mb-8 transition-opacity duration-[2000ms]"
+          className="relative w-full max-w-4xl mb-8 transition-opacity duration-[2000ms] flex items-center justify-center bg-black"
           style={{
             height: '400px',
             opacity: showVideo ? 1 : 0
           }}
         >
           <video 
-            className="w-full h-full rounded-lg border-2 border-inferno-border object-cover"
+            className="w-full h-full rounded-lg border-2 border-inferno-border object-contain object-center bg-black"
             autoPlay 
             muted 
             loop
