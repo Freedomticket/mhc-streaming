@@ -35,7 +35,7 @@ export default function WatchPage({ params }: { params: { id: string } }) {
       
       // Track view
       api.post(`/videos/${params.id}/view`).catch(() => {})
-    } catch (err: any) {
+    } catch (err) {
       setError('Video not found or unavailable')
     } finally {
       setLoading(false)
@@ -101,9 +101,8 @@ export default function WatchPage({ params }: { params: { id: string } }) {
             <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
               <video
                 controls
-                className="w-full h-full"
+                className="w-full h-full object-contain"
                 poster={video.thumbnailUrl}
-                src={video.videoUrl}
               >
                 <source src={video.videoUrl} type="video/mp4" />
                 Your browser does not support the video tag.
