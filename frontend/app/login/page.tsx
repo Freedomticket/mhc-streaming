@@ -18,17 +18,17 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { data } = await api.post('/auth/login', {
+      const { data } = await api.post('/api/auth/login', {
         email,
         password,
       })
 
       // Save tokens
-      api.saveTokens(data.accessToken, data.refreshToken)
+      api.saveTokens(data.data.accessToken, data.data.refreshToken)
       
       // Save user data
       if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data.user))
+        localStorage.setItem('user', JSON.stringify(data.data.user))
       }
 
       // Redirect to dashboard

@@ -15,7 +15,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "charter:pdf": "node scripts/generate-charter-pdf.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
