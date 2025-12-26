@@ -33,6 +33,9 @@ export default function Header() {
             <Link href="/artists" className="link-inferno text-sm font-semibold">
               Artists
             </Link>
+            <Link href="/charter" className="link-inferno text-sm font-semibold">
+              Charter
+            </Link>
             <Link href="/dashboard" className="link-inferno text-sm font-semibold">
               Dashboard
             </Link>
@@ -98,6 +101,13 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Artists
+            </Link>
+            <Link
+              href="/charter"
+              className="block text-white hover:text-paradiso-gold transition-colors py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Charter
             </Link>
             <Link
               href="/dashboard"
