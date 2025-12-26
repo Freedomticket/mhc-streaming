@@ -2,9 +2,9 @@ import { prisma } from '@/app/lib/prisma'
 import { getThemeConfig, Theme } from '@/app/lib/theme'
 import Link from 'next/link'
 
-async function getData(slug: string) {
+async function getData(id: string) {
   try {
-    const artist = await prisma.artist.findUnique({ where: { slug } })
+    const artist = await prisma.artist.findUnique({ where: { id } })
     if (!artist) return null
     const items = await prisma.galleryItem.findMany({ where: { artistId: artist.id }, orderBy: [{ order: 'asc' }, { createdAt: 'desc' }] })
     return { artist, items }
@@ -13,8 +13,8 @@ async function getData(slug: string) {
   }
 }
 
-export default async function ArtistGalleryPage({ params }: { params: { slug: string } }) {
-  const data = await getData(params.slug)
+export default async function ArtistGalleryPage({ params }: { params: { id: string } }) {
+  const data = await getData(params.id)
 
   if (!data) {
     return (
@@ -38,7 +38,7 @@ export default async function ArtistGalleryPage({ params }: { params: { slug: st
             <h1 style={{ color: theme.colors.primary, fontSize: '2rem' }}>{data.artist.name}</h1>
             <p style={{ color: '#C7C7C7' }}>{data.artist.bio || 'Artist gallery'}</p>
           </div>
-          <Link href={`/artist/${data.artist.slug}/settings`} style={{ padding: '0.6rem 1rem', borderRadius: 6, background: theme.colors.secondary, color: theme.colors.text }}>Edit Theme & Uploads</Link>
+          <Link href={`/artist/${data.artist.id}/settings`} style={{ padding: '0.6rem 1rem', borderRadius: 6, background: theme.colors.secondary, color: theme.colors.text }}>Edit Theme & Uploads</Link>
         </div>
       </section>
 

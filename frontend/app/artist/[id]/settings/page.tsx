@@ -2,12 +2,12 @@ import Link from 'next/link'
 import { prisma } from '@/app/lib/prisma'
 import { THEME_CONFIG } from '@/app/lib/theme'
 
-async function getArtist(slug: string) {
-  try { return await prisma.artist.findUnique({ where: { slug } }) } catch { return null }
+async function getArtist(id: string) {
+  try { return await prisma.artist.findUnique({ where: { id } }) } catch { return null }
 }
 
-export default async function ArtistSettingsPage({ params }: { params: { slug: string } }) {
-  const artist = await getArtist(params.slug)
+export default async function ArtistSettingsPage({ params }: { params: { id: string } }) {
+  const artist = await getArtist(params.id)
   if (!artist) {
     return (
       <main style={{ padding: '2rem' }}>
@@ -32,6 +32,7 @@ export default async function ArtistSettingsPage({ params }: { params: { slug: s
           <form key={key} action={`/api/artists/${artist.slug}`} method="post" style={{ borderRadius: 8, padding: '1rem', border: `2px solid ${t.colors.border}`, background: 'rgba(0,0,0,0.35)' }}>
             <input type="hidden" name="method" value="PUT" />
             <input type="hidden" name="theme" value={key} />
+            <input type="hidden" name="id" value={artist.id} />
             <div style={{ height: 120, borderRadius: 6, background: t.colors.background, marginBottom: 12 }} />
             <h3 style={{ color: t.colors.primary }}>{key}</h3>
             <button type="submit" style={{ marginTop: 8, padding: '0.5rem 0.8rem', borderRadius: 6, background: t.colors.secondary, color: t.colors.text, border: `1px solid ${t.colors.border}` }}>Set Theme</button>
@@ -40,7 +41,7 @@ export default async function ArtistSettingsPage({ params }: { params: { slug: s
       </section>
 
       <section style={{ padding: '2rem' }}>
-        <Link href={`/artist/${artist.slug}/gallery`} style={{ color: '#FFD700', textDecoration: 'underline' }}>Back to gallery</Link>
+        <Link href={`/artist/${artist.id}/gallery`} style={{ color: '#FFD700', textDecoration: 'underline' }}>Back to gallery</Link>
       </section>
     </main>
   )
