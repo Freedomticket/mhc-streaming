@@ -27,7 +27,7 @@ npx prisma generate
 
 echo "📦 Installing auth service..."
 cd "$REPO_ROOT/services/auth-service"
-npm install
+npm install --include=dev
 
 echo "🔨 Building auth service..."
 npm run build
