@@ -10,14 +10,14 @@ npm install
 
 echo "📦 Installing common package..."
 cd "$REPO_ROOT/packages/common"
-npm install
+npm install --include=dev
 
 echo "🔨 Building common package..."
 npm run build
 
 echo "📦 Installing database package..."
 cd "$REPO_ROOT/packages/database"
-npm install
+npm install --include=dev
 
 echo "🔨 Building database package..."
 npm run build
