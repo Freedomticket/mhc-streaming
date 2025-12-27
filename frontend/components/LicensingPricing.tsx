@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { paymentApi, authApi, handleApiError } from '../lib/api-client'
+import { api } from '@/src/lib/api'
 import { useRouter } from 'next/navigation'
 
 export default function LicensingPricing() {
@@ -14,10 +14,7 @@ export default function LicensingPricing() {
 
     try {
       // Check if user is logged in
-      try {
-        await authApi.getCurrentUser()
-      } catch {
-        // Not logged in, redirect to register
+      if (!api.isAuthenticated()) {
         router.push('/register?redirect=/licensing')
         return
       }
@@ -36,19 +33,19 @@ export default function LicensingPricing() {
 
       // Paid tiers - create checkout session
       if (priceId) {
-        const response = await paymentApi.createCheckoutSession({
+        const { data } = await api.post('/api/payment/checkout', {
           tier: tierName,
           priceId,
         })
 
-        if (response.success && response.data?.checkoutUrl) {
-          window.location.href = response.data.checkoutUrl
+        if (data.success && data.data?.checkoutUrl) {
+          window.location.href = data.data.checkoutUrl
         } else {
           setError('Failed to create checkout session')
         }
       }
-    } catch (err) {
-      setError(handleApiError(err))
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'An error occurred')
     } finally {
       setLoading(null)
     }

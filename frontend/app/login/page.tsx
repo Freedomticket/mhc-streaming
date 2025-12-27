@@ -34,7 +34,24 @@ export default function LoginPage() {
       // Redirect to dashboard
       router.push('/dashboard')
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.')
+      const errorDetails = {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        message: err.response?.data?.message || err.message,
+        data: err.response?.data,
+        url: err.config?.url,
+        method: err.config?.method,
+        fullError: err
+      }
+      console.error('Login failed:', errorDetails)
+      
+      if (!err.response) {
+        setError('Cannot reach server. Please check your connection or try again later.')
+      } else if (err.response.status >= 500) {
+        setError(`Server error (${err.response.status}). Please try again later.`)
+      } else {
+        setError(err.response?.data?.message || err.response?.data?.error?.message || 'Login failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
