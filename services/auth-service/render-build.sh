@@ -1,21 +1,22 @@
 #!/bin/bash
 set -e
 
-echo "🔧 Building from monorepo root..."
-cd ../..
+echo "🔧 Finding repo root..."
+REPO_ROOT="$(pwd)"
 
 echo "📦 Installing root dependencies..."
+cd "$REPO_ROOT"
 npm install
 
 echo "📦 Installing common package..."
-cd packages/common
+cd "$REPO_ROOT/packages/common"
 npm install
 
 echo "🔨 Building common package..."
 npm run build
 
 echo "📦 Installing database package..."
-cd ../database
+cd "$REPO_ROOT/packages/database"
 npm install
 
 echo "🔨 Building database package..."
@@ -25,7 +26,7 @@ echo "🔨 Generating Prisma Client..."
 npx prisma generate
 
 echo "📦 Installing auth service..."
-cd ../../services/auth-service
+cd "$REPO_ROOT/services/auth-service"
 npm install
 
 echo "🔨 Building auth service..."
