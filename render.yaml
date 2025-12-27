@@ -19,7 +19,7 @@ services:
     region: oregon
     plan: free
     buildCommand: bash services/auth-service/render-build.sh
-    startCommand: cd services/auth-service && npm start
+    startCommand: cd services/auth-service && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
