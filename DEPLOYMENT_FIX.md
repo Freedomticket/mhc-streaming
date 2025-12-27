@@ -32,17 +32,26 @@ Added Infrastructure-as-Code configuration for Render.com deployment.
 ### Option B: Manual Update (Quick Fix)
 For your existing auth service:
 1. Go to Render dashboard → mhc-auth-service
-2. Go to "Environment" tab
-3. Verify these environment variables exist:
+2. Go to "Settings" tab
+3. Update "Build Command" to:
+   ```
+   npm install --prefix ../.. && npm install --prefix ../../packages/common && npm run --prefix ../../packages/common build && npm install --prefix ../../packages/database && npm run --prefix ../../packages/database build && npx --prefix ../../packages/database prisma generate && npm install && npm run build
+   ```
+   OR use the build script:
+   ```
+   bash services/auth-service/render-build.sh
+   ```
+4. Update "Start Command" to:
+   ```
+   npm start
+   ```
+5. Go to "Environment" tab
+6. Verify these environment variables exist:
    - `DATABASE_URL` (should point to your Postgres instance)
    - `JWT_SECRET` (any random 32+ character string)
    - `JWT_REFRESH_SECRET` (different random string)
-4. Go to "Settings" tab
-5. Update "Build Command" to:
-   ```
-   npm install && npm run build
-   ```
-6. Click "Manual Deploy" → "Deploy latest commit"
+   - `ALLOWED_ORIGINS` (add your frontend URL)
+7. Click "Manual Deploy" → "Deploy latest commit"
 
 ### Required Environment Variables
 

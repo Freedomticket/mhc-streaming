@@ -18,7 +18,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd services/auth-service && npm install && npm run build
+    buildCommand: bash services/auth-service/render-build.sh
     startCommand: cd services/auth-service && npm start
     envVars:
       - key: NODE_ENV
@@ -47,8 +47,9 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd services/payment-service && npm install && npm run build
-    startCommand: cd services/payment-service && npm start
+    rootDir: services/payment-service
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
