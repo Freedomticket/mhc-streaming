@@ -5,9 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
-    "start": "node dist/index.js",
-    "postinstall": "prisma generate"
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "prisma": {
+    "schema": "../../packages/database/prisma/schema.prisma"
   },
   "dependencies": {
     "@mhc/common": "*",
