@@ -44,10 +44,27 @@ export default function DashboardPage() {
 
   const fetchDashboard = async () => {
     try {
-      const { data: dashboardData } = await api.get('/users/me/dashboard')
+      const { data: userData } = await api.get('/api/auth/me')
+      // Create dashboard data from user data + mock stats
+      const dashboardData: DashboardData = {
+        user: {
+          id: userData.data.id,
+          username: userData.data.username,
+          email: userData.data.email,
+          subscriptionTier: userData.data.subscription?.tier || 'FREE',
+          createdAt: userData.data.createdAt
+        },
+        stats: {
+          totalVideos: 0,
+          totalViews: 0,
+          totalLikes: 0,
+          followers: 0
+        },
+        recentVideos: []
+      }
       setData(dashboardData)
     } catch (err) {
-      console.error(err)
+      console.error('Dashboard error:', err)
     } finally {
       setLoading(false)
     }
