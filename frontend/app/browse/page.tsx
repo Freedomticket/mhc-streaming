@@ -32,8 +32,9 @@ export default function BrowsePage() {
       const { data } = await api.get('/videos')
       setVideos(data.videos || [])
     } catch (err: any) {
-      setError('Failed to load videos')
-      console.error(err)
+      // Media service not deployed yet - show empty state
+      console.log('Videos endpoint not available:', err)
+      setVideos([])
     } finally {
       setLoading(false)
     }
