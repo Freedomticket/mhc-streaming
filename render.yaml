@@ -41,6 +41,54 @@ services:
       - key: ALLOWED_ORIGINS
         value: https://mhc-streaming.onrender.com,http://localhost:3000
 
+  # API Gateway
+  - type: web
+    name: mhc-api-gateway
+    env: node
+    region: oregon
+    plan: free
+    rootDir: services/api-gateway
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: AUTH_SERVICE_URL
+        value: https://mhc-auth-service.onrender.com
+      - key: MEDIA_SERVICE_URL
+        value: https://mhc-media-service.onrender.com
+      - key: PAYMENT_SERVICE_URL
+        value: https://mhc-payment-service.onrender.com
+      - key: STREAM_SERVICE_URL
+        value: https://mhc-stream-service.onrender.com
+      - key: ANALYTICS_SERVICE_URL
+        value: https://mhc-analytics-service.onrender.com
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # Media Service
+  - type: web
+    name: mhc-media-service
+    env: node
+    region: oregon
+    plan: free
+    rootDir: services/media-service
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
   # Payment Service  
   - type: web
     name: mhc-payment-service

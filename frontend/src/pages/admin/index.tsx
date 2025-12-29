@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
+import { api } from '@/lib/api';
 
 interface DashboardStats {
   pendingReports: number;
@@ -23,7 +23,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Fetch dashboard summary from backend
-    axios.get('/api/admin/dashboard').then((res) => {
+    api.get('/admin/dashboard').then((res) => {
       setStats(res.data.summary);
       setLoading(false);
     }).catch(() => {

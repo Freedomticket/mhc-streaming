@@ -17,13 +17,16 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
+    console.log('🔥 Starting login request...');
+    console.log('📍 API Base URL:', (api as any).client?.defaults?.baseURL);
+
     try {
+      console.log('📤 Sending POST to /api/auth/login');
       const { data } = await api.post('/api/auth/login', {
         email,
         password,
       })
 
-      // Save tokens
       api.saveTokens(data.data.accessToken, data.data.refreshToken)
       
       // Save user data
@@ -34,16 +37,9 @@ export default function LoginPage() {
       // Redirect to dashboard
       router.push('/dashboard')
     } catch (err: any) {
-      const errorDetails = {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        message: err.response?.data?.message || err.message,
-        data: err.response?.data,
-        url: err.config?.url,
-        method: err.config?.method,
-        fullError: err
-      }
-      console.error('Login failed:', errorDetails)
+      console.error('❌ Login error:', err);
+      console.error('❌ Error response:', err.response);
+      console.error('❌ Error message:', err.message);
       
       if (!err.response) {
         setError('Cannot reach server. Please check your connection or try again later.')
