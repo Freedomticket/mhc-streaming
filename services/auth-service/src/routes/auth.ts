@@ -251,7 +251,7 @@ router.get('/me', generalLimiter, async (req, res) => {
     }
     
     const token = authHeader.substring(7);
-    const payload = verifyRefreshToken(token);
+    const payload = verifyAccessToken(token);
     
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
