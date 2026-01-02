@@ -5,23 +5,32 @@ echo "🔧 Finding repo root..."
 # Navigate to repo root (two levels up from payment-service)
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
 
-echo "📦 Installing all workspace dependencies..."
+echo "📦 Installing root dependencies..."
 cd "$REPO_ROOT"
 npm install
-npm install --workspaces --include-workspace-root
+
+echo "📦 Installing common package..."
+cd "$REPO_ROOT/packages/common"
+npm install --include=dev
 
 echo "🔨 Building common package..."
-npm run build --workspace=@mhc/common
+npm run build
+
+echo "📦 Installing database package..."
+cd "$REPO_ROOT/packages/database"
+npm install --include=dev
 
 echo "🔨 Building database package..."
-npm run build --workspace=@mhc/database
+npm run build
 
 echo "🔨 Generating Prisma Client..."
-cd "$REPO_ROOT/packages/database"
 npx prisma generate
-cd "$REPO_ROOT"
+
+echo "📦 Installing payment service..."
+cd "$REPO_ROOT/services/payment-service"
+npm install --include=dev
 
 echo "🔨 Building payment service..."
-npm run build --workspace=@mhc/payment-service
+npm run build
 
 echo "✅ Build complete!"
