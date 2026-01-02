@@ -10,6 +10,13 @@
     "services/royalty-service",
     "services/api-gateway",
     "services/media-service",
+    "services/stream-service",
+    "services/analytics-service",
+    "services/moderation-service",
+    "services/chat-service",
+    "services/ai-service",
+    "services/pod",
+    "services/premium-gen",
     "packages/*"
   ],
   "scripts": {

@@ -139,3 +139,143 @@ services:
           property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # Stream Service
+  - type: web
+    name: mhc-stream-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/stream-service/render-build.sh
+    startCommand: cd services/stream-service && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # Analytics Service
+  - type: web
+    name: mhc-analytics-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/analytics-service/render-build.sh
+    startCommand: cd services/analytics-service && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # Moderation Service
+  - type: web
+    name: mhc-moderation-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/moderation-service/render-build.sh
+    startCommand: cd services/moderation-service && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # Chat Service
+  - type: web
+    name: mhc-chat-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/chat-service/render-build.sh
+    startCommand: cd services/chat-service && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # AI Service
+  - type: web
+    name: mhc-ai-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/ai-service/render-build.sh
+    startCommand: cd services/ai-service && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # POD Service
+  - type: web
+    name: mhc-pod-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/pod/render-build.sh
+    startCommand: cd services/pod && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
+
+  # Premium-Gen Service
+  - type: web
+    name: mhc-premium-gen-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: bash services/premium-gen/render-build.sh
+    startCommand: cd services/premium-gen && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mhc-database
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://mhc-streaming.onrender.com,http://localhost:3000
