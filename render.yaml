@@ -18,7 +18,17 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: bash services/auth-service/render-build.sh
+    buildCommand: |
+      echo "Installing workspace dependencies..."
+      npm install
+      echo "Building common package..."
+      npm run build --workspace=packages/common
+      echo "Building database package..."
+      npm run build --workspace=packages/database
+      echo "Generating Prisma client..."
+      cd packages/database && npx prisma generate && cd ../..
+      echo "Building auth service..."
+      npm run build --workspace=services/auth-service
     startCommand: cd services/auth-service && node dist/index.js
     envVars:
       - key: NODE_ENV
@@ -95,9 +105,13 @@ services:
     env: node
     region: oregon
     plan: free
-    rootDir: services/payment-service
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: |
+      npm install
+      npm run build --workspace=packages/common
+      npm run build --workspace=packages/database
+      cd packages/database && npx prisma generate && cd ../..
+      npm run build --workspace=services/payment-service
+    startCommand: cd services/payment-service && npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -127,9 +141,13 @@ services:
     env: node
     region: oregon
     plan: free
-    rootDir: services/royalty-service
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: |
+      npm install
+      npm run build --workspace=packages/common
+      npm run build --workspace=packages/database
+      cd packages/database && npx prisma generate && cd ../..
+      npm run build --workspace=services/royalty-service
+    startCommand: cd services/royalty-service && npm start
     envVars:
       - key: NODE_ENV
         value: production

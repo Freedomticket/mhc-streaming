@@ -2,7 +2,8 @@
 set -e
 
 echo "🔧 Finding repo root..."
-REPO_ROOT="$(pwd)"
+# Navigate to repo root (two levels up from auth-service)
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
 
 echo "📦 Installing root dependencies..."
 cd "$REPO_ROOT"
