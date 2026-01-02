@@ -8,6 +8,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
 echo "📦 Installing root dependencies..."
 cd "$REPO_ROOT"
 npm install
+# Install @types at root to ensure they're available
+npm install @types/jsonwebtoken @types/express @types/node @types/cors @types/bcryptjs
 
 echo "📦 Installing common package..."
 cd "$REPO_ROOT/packages/common"
