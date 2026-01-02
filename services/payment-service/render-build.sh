@@ -12,7 +12,8 @@ npm install
 echo "📦 Installing common package..."
 cd "$REPO_ROOT/packages/common"
 npm install --include=dev
-npm install --save-dev @types/jsonwebtoken @types/express @types/node
+# Explicit install of @types in common package node_modules
+cd "$REPO_ROOT/packages/common" && npm install @types/jsonwebtoken @types/express @types/node @types/cors
 
 echo "🔨 Building common package..."
 npm run build
