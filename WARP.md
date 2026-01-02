@@ -344,7 +344,9 @@ npm run build  # @types packages won't be available
 1. **Node 25.2.1 npm bug** - Fixed by pinning to Node 20.x
 2. **Module resolution errors** - Fixed by using workspace build commands
 3. **Royalty service schema mismatch** - Simplified service to use existing schema fields
-4. **TypeScript @types not found** - Fixed by removing individual npm installs
+4. **TypeScript @types not found** - Fixed by installing @types at root level + typeRoots in tsconfig
+5. **Windows line ending issues** - Fixed with .gitattributes forcing LF for .sh files
+6. **Broken services polluting workspace** - Removed 7 broken services, explicit workspace list
 
 ### CRITICAL RULE: DO NOT BREAK WORKING SERVICES
 **IF A SERVICE IS WORKING, DO NOT TOUCH IT UNDER ANY CIRCUMSTANCES**
@@ -357,9 +359,178 @@ When fixing one service:
 5. Any attempt to "unify" or "improve" working services will be rejected
 
 ### Working Service Build Scripts (LOCKED - DO NOT MODIFY)
-- **Auth service**: Uses pattern from commit `c078120` - individual npm installs in subdirectories
-- **Royalty service**: Uses pattern from commit `88e5b6d` - individual npm installs in subdirectories
+- **Auth service**: Commit `c078120` - individual npm installs in subdirectories
+- **Royalty service**: Commit `88e5b6d` - individual npm installs in subdirectories  
+- **Payment service**: Commit `a30ff40` - installs @types at root, then builds packages individually
 - These patterns work. Do not try to "fix" them.
+
+## Backend Architecture (Current State - 2026-01-02)
+
+### Working Services (DEPLOYED)
+1. **Auth Service** (✅ WORKING)
+   - Handles user authentication, JWT tokens
+   - Dependencies: @mhc/common, @mhc/database, Redis
+   - Bash build script with individual package installs
+   - Start: `cd services/auth-service && node dist/index.js`
+
+2. **Payment Service** (✅ WORKING)
+   - Handles Stripe payments and subscriptions
+   - Dependencies: @mhc/common, @mhc/database, Redis, Stripe
+   - Bash build: installs @types at root first, then packages
+   - Start: `cd services/payment-service && npm start`
+
+3. **Royalty Service** (✅ WORKING - SIMPLIFIED)
+   - Basic royalty stats and payout history
+   - Advanced features disabled (cron, calculations, stream tracking)
+   - Dependencies: @mhc/common, @mhc/database
+   - Bash build script with individual package installs
+   - Start: `cd services/royalty-service && npm start`
+
+4. **API Gateway** (✅ WORKING)
+   - Routes requests to backend services
+   - Uses rootDir pattern: `rootDir: services/api-gateway`
+   - Build: `npm install && npm run build`
+   - Start: `npm start`
+
+5. **Media Service** (✅ WORKING)
+   - Handles media uploads and storage
+   - Uses rootDir pattern
+   - Build: `npm install && npm run build`
+   - Start: `npm start`
+
+### Shared Packages
+- **@mhc/common**: Shared types, utilities, constants
+  - CRITICAL: Needs @types installed at ROOT level for TypeScript
+  - tsconfig has typeRoots pointing to local and root node_modules
+  
+- **@mhc/database**: Prisma client and schema
+  - Located: packages/database/prisma/schema.prisma
+  - Generate: `npx prisma generate`
+
+### Monorepo Structure
+```
+mhc-streaming/
+├── package.json (workspaces defined explicitly)
+├── .gitattributes (forces LF for .sh files)
+├── frontend/
+├── packages/
+│   ├── common/ (shared code)
+│   └── database/ (Prisma)
+└── services/
+    ├── auth-service/ (WORKING)
+    ├── payment-service/ (WORKING)
+    ├── royalty-service/ (WORKING - simplified)
+    ├── api-gateway/ (WORKING)
+    └── media-service/ (WORKING)
+```
+
+### Key Build Script Pattern (Payment Service)
+```bash
+#!/bin/bash
+set -e
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+
+# Install root deps + @types packages at ROOT
+cd "$REPO_ROOT"
+npm install
+npm install @types/jsonwebtoken @types/express @types/node @types/cors @types/bcryptjs
+
+# Build common (will find @types in root node_modules)
+cd "$REPO_ROOT/packages/common"
+npm install --include=dev
+npm run build
+
+# Build database
+cd "$REPO_ROOT/packages/database"
+npm install --include=dev
+npm run build
+npx prisma generate
+
+# Build service
+cd "$REPO_ROOT/services/{service-name}"
+npm install --include=dev
+npm run build
+```
+
+## Newly Implemented Services (2026-01-02)
+
+### Re-implemented Services (NOT YET DEPLOYED)
+These services were recreated from scratch using the proven payment service pattern.
+They are ready for deployment but NOT yet added to package.json workspaces.
+
+1. **Stream Service** (✅ IMPLEMENTED - Port 3005)
+   - Purpose: Live streaming management
+   - Endpoints: GET /api/streams, POST /api/streams/start, POST /api/streams/:id/end
+   - Features: Start/end streams, viewer count tracking, stream history
+   - Status: Code complete, needs deployment testing
+
+2. **Analytics Service** (✅ IMPLEMENTED - Port 3006)
+   - Purpose: Analytics and metrics tracking
+   - Endpoints: GET /api/analytics/user/:userId, GET /api/analytics/trending/tracks
+   - Features: User metrics, track analytics, platform stats, play count tracking
+   - Status: Code complete, needs deployment testing
+
+3. **Moderation Service** (✅ IMPLEMENTED - Port 3007)
+   - Purpose: Content moderation
+   - Endpoints: POST /api/moderation/report, POST /api/moderation/action
+   - Features: Content reporting, moderation actions, basic content filtering
+   - Status: Code complete, needs deployment testing
+
+4. **Chat Service** (✅ IMPLEMENTED - Port 3008)
+   - Purpose: Real-time chat via WebSockets
+   - Technology: Socket.IO for WebSocket support
+   - Features: Stream chat rooms, join/leave events, message broadcasting
+   - Status: Code complete, needs deployment testing
+
+5. **AI Service** (✅ IMPLEMENTED - Port 3009)
+   - Purpose: AI recommendations and content suggestions
+   - Endpoints: GET /api/ai/recommendations/tracks, GET /api/ai/similar/tracks/:id
+   - Features: Track/artist recommendations, similar tracks, auto-tagging
+   - Status: Code complete, needs deployment testing
+
+6. **POD Service** (✅ IMPLEMENTED - Port 3010)
+   - Purpose: Print-on-demand merchandise
+   - Endpoints: GET /api/pod/products, POST /api/pod/designs, POST /api/pod/orders
+   - Features: Product catalog, custom designs, order management
+   - Status: Code complete, needs deployment testing
+
+7. **Premium-Gen Service** (✅ IMPLEMENTED - Port 3011)
+   - Purpose: Premium content generation (AI artwork, promo content)
+   - Endpoints: POST /api/premium/generate/artwork, POST /api/premium/generate/promo
+   - Features: AI artwork generation, promotional content, track descriptions
+   - Status: Code complete, needs deployment testing
+
+### Deployment Process for New Services
+**IMPORTANT**: Do NOT deploy these services until user approval!
+
+1. **Local Testing First**
+   - Test build locally: `cd services/{service-name} && npm install && npm run build`
+   - Verify TypeScript compiles without errors
+   - Test locally with `npm run dev`
+
+2. **Add to Workspace** (only after local build succeeds)
+   - Edit `package.json` (root) to add service to workspaces array
+   - Example: `"services/stream-service"`
+
+3. **Add to render.yaml** (only after workspace build succeeds)
+   - Copy payment-service configuration as template
+   - Update service name, build command path, start command path
+   - Set correct port in environment variables
+
+4. **Deploy to Render**
+   - Push to git
+   - Render will auto-deploy
+   - Monitor logs for errors
+
+5. **Rollback Plan**
+   - If new service breaks: remove from workspaces immediately
+   - Working services (auth, payment, royalty) are LOCKED - never modify
+
+### Next Steps
+- User should review and approve each service before deployment
+- Deploy ONE service at a time
+- Test each service thoroughly before deploying the next
 
 ### Before Modifying Render Config
 1. Ask user for explicit approval FIRST
