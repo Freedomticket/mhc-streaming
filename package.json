@@ -5,7 +5,11 @@
   "private": true,
   "workspaces": [
     "frontend",
-    "services/*",
+    "services/auth-service",
+    "services/payment-service",
+    "services/royalty-service",
+    "services/api-gateway",
+    "services/media-service",
     "packages/*"
   ],
   "scripts": {
