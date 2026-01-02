@@ -346,13 +346,28 @@ npm run build  # @types packages won't be available
 3. **Royalty service schema mismatch** - Simplified service to use existing schema fields
 4. **TypeScript @types not found** - Fixed by removing individual npm installs
 
+### CRITICAL RULE: DO NOT BREAK WORKING SERVICES
+**IF A SERVICE IS WORKING, DO NOT TOUCH IT UNDER ANY CIRCUMSTANCES**
+
+When fixing one service:
+1. **ONLY modify the broken service** - never touch working services
+2. Test your changes on ONLY the broken service
+3. If your fix requires changes to shared code, STOP and ask user first
+4. Auth and Royalty services are WORKING - their build scripts are LOCKED
+5. Any attempt to "unify" or "improve" working services will be rejected
+
+### Working Service Build Scripts (LOCKED - DO NOT MODIFY)
+- **Auth service**: Uses pattern from commit `c078120` - individual npm installs in subdirectories
+- **Royalty service**: Uses pattern from commit `88e5b6d` - individual npm installs in subdirectories
+- These patterns work. Do not try to "fix" them.
+
 ### Before Modifying Render Config
 1. Ask user for explicit approval FIRST
 2. Test changes locally if possible
-3. Only change ONE thing at a time
+3. Only change ONE service at a time - NEVER modify working services
 4. Document what changed and why
 5. If build fails, immediately revert to last known working commit
-6. NEVER modify bash build scripts without understanding workspace dependencies
+6. NEVER modify bash build scripts for working services
 
 ## Important Notes
 
