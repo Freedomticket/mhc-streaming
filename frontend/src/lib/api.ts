@@ -88,19 +88,21 @@ class ApiClient {
             }
 
             const { data } = await axios.post(
-              `${this.client.defaults.baseURL}/auth/refresh`,
-              { refresh: refreshToken }
+              `${this.client.defaults.baseURL}/api/auth/refresh`,
+              { refreshToken: refreshToken }
             );
 
-            this.saveTokens(data.access, refreshToken);
+            this.saveTokens(data.data?.accessToken || data.accessToken, refreshToken);
 
             // Retry failed requests
-            this.failedQueue.forEach(({ resolve }) => resolve(data.access));
+            const newAccessToken = data.data?.accessToken || data.accessToken;
+            this.failedQueue.forEach(({ resolve }) => resolve(newAccessToken));
             this.failedQueue = [];
 
             // Retry original request
+            const newAccessToken = data.data?.accessToken || data.accessToken;
             originalRequest.headers = originalRequest.headers || {};
-            originalRequest.headers.Authorization = `Bearer ${data.access}`;
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
             return this.client(originalRequest);
           } catch (refreshError) {
@@ -250,5 +252,6 @@ export const api = new ApiClient(apiBaseUrl);
 export const getAccessToken = () => api.getAccessToken();
 export const getRefreshToken = () => api.getRefreshToken();
 export const saveTokens = (access: string, refresh: string) => api.saveTokens(access, refresh);
+export const clearTokens = () => api.clearTokens();
 export const logout = () => api.logout();
 export const isAuthenticated = () => api.isAuthenticated();
