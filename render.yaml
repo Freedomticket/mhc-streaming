@@ -95,12 +95,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: |
-      npm install
-      npm run build --workspace=packages/common
-      npm run build --workspace=packages/database
-      cd packages/database && npx prisma generate && cd ../..
-      npm run build --workspace=services/payment-service
+    buildCommand: bash services/payment-service/render-build.sh
     startCommand: cd services/payment-service && npm start
     envVars:
       - key: NODE_ENV
@@ -131,12 +126,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: |
-      npm install
-      npm run build --workspace=packages/common
-      npm run build --workspace=packages/database
-      cd packages/database && npx prisma generate && cd ../..
-      npm run build --workspace=services/royalty-service
+    buildCommand: bash services/royalty-service/render-build.sh
     startCommand: cd services/royalty-service && npm start
     envVars:
       - key: NODE_ENV
