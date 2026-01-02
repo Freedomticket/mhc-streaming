@@ -296,6 +296,28 @@ psql $DATABASE_URL < database/schema.sql
 - Daily automated backups with 30-day retention
 - Point-in-time recovery enabled
 
+## Critical: Render Deployment Configuration (DO NOT BREAK)
+
+### Node.js Version (package.json)
+- **MUST** stay pinned to `20.x` (Node 20 LTS)
+- **DO NOT** use unbounded ranges like `>=18.0.0`
+- **Reason:** Node 25+ has npm bugs that break Render builds
+- **Last working commit:** `c078120` (2026-01-02)
+
+### Auth Service Build (render.yaml)
+- **MUST** use `buildCommand: bash services/auth-service/render-build.sh`
+- **DO NOT** replace with inline npm workspace commands
+- **MUST** use `startCommand: cd services/auth-service && node dist/index.js`
+- **Reason:** The bash script handles monorepo dependencies correctly; inline commands fail with "Cannot find module" errors
+- **Last known working:** `ea2f9e7` and `c078120`
+
+### Before Modifying Render Config
+1. Ask user for explicit approval FIRST
+2. Test changes locally if possible
+3. Only change ONE thing at a time
+4. Document what changed and why
+5. If build fails, immediately revert to last known working commit
+
 ## Important Notes
 
 - **No AWS, Firebase, Azure dependencies** - GCP only (except S3 as storage fallback)
