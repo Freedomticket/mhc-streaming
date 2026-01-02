@@ -304,12 +304,47 @@ psql $DATABASE_URL < database/schema.sql
 - **Reason:** Node 25+ has npm bugs that break Render builds
 - **Last working commit:** `c078120` (2026-01-02)
 
-### Auth Service Build (render.yaml)
-- **MUST** use `buildCommand: bash services/auth-service/render-build.sh`
-- **DO NOT** replace with inline npm workspace commands
-- **MUST** use `startCommand: cd services/auth-service && node dist/index.js`
-- **Reason:** The bash script handles monorepo dependencies correctly; inline commands fail with "Cannot find module" errors
-- **Last known working:** `ea2f9e7` and `c078120`
+### Service Build Scripts (render.yaml)
+- **ALL services** (auth, payment, royalty) MUST use bash build scripts
+- **Pattern:** `buildCommand: bash services/{service-name}/render-build.sh`
+- **Reason:** Bash scripts handle monorepo workspace dependencies correctly
+- **Last known working:** `8deba56` (2026-01-02)
+
+### Build Script Requirements
+**CRITICAL:** Build scripts MUST use npm workspace commands, NOT individual package installs.
+
+**CORRECT pattern (working):**
+```bash
+cd "$REPO_ROOT"
+npm install  # Install all workspace dependencies at root
+npm run build --workspace=@mhc/common
+npm run build --workspace=@mhc/database
+npm run build --workspace=@mhc/{service-name}
+```
+
+**INCORRECT pattern (breaks TypeScript compilation):**
+```bash
+cd "$REPO_ROOT/packages/common"
+npm install --include=dev  # DON'T DO THIS
+npm run build  # @types packages won't be available
+```
+
+**Why this matters:**
+- Individual `npm install` in subdirectories breaks workspace linking
+- TypeScript can't find `@types` packages (e.g., `@types/cors`, `@types/jsonwebtoken`)
+- Results in "Cannot find module" errors during build
+- Using `npm run build --workspace=` respects monorepo structure
+
+### Service Start Commands
+- **Auth/Payment/Royalty:** `cd services/{service} && node dist/index.js`
+- Run from service directory to maintain correct working directory
+- Node resolves workspace dependencies from root `node_modules`
+
+### Known Issues Fixed (2026-01-02)
+1. **Node 25.2.1 npm bug** - Fixed by pinning to Node 20.x
+2. **Module resolution errors** - Fixed by using workspace build commands
+3. **Royalty service schema mismatch** - Simplified service to use existing schema fields
+4. **TypeScript @types not found** - Fixed by removing individual npm installs
 
 ### Before Modifying Render Config
 1. Ask user for explicit approval FIRST
@@ -317,6 +352,7 @@ psql $DATABASE_URL < database/schema.sql
 3. Only change ONE thing at a time
 4. Document what changed and why
 5. If build fails, immediately revert to last known working commit
+6. NEVER modify bash build scripts without understanding workspace dependencies
 
 ## Important Notes
 
