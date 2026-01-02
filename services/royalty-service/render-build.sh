@@ -7,7 +7,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
 
 echo "📦 Installing all workspace dependencies..."
 cd "$REPO_ROOT"
-npm install --include-workspace-root
+npm install
+npm install --workspaces --include-workspace-root
 
 echo "🔨 Building common package..."
 npm run build --workspace=@mhc/common
