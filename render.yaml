@@ -18,17 +18,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: |
-      echo "Installing workspace dependencies..."
-      npm install
-      echo "Building common package..."
-      npm run build --workspace=packages/common
-      echo "Building database package..."
-      npm run build --workspace=packages/database
-      echo "Generating Prisma client..."
-      cd packages/database && npx prisma generate && cd ../..
-      echo "Building auth service..."
-      npm run build --workspace=services/auth-service
+    buildCommand: bash services/auth-service/render-build.sh
     startCommand: cd services/auth-service && node dist/index.js
     envVars:
       - key: NODE_ENV
