@@ -33,18 +33,18 @@ app.get('/health', (req, res) => {
 app.get('/api/streams', async (req, res) => {
   try {
     const streams = await prisma.stream.findMany({
-      where: { isLive: true },
+      where: { status: 'LIVE' },
       include: {
-        artist: {
+        user: {
           select: {
             id: true,
             username: true,
             displayName: true,
-            profileImage: true,
+            avatar: true,
           },
         },
       },
-      orderBy: { viewerCount: 'desc' },
+      orderBy: { viewCount: 'desc' },
     });
     
     res.json(successResponse(streams));
@@ -64,13 +64,13 @@ app.get('/api/streams/:streamId', async (req, res) => {
     const stream = await prisma.stream.findUnique({
       where: { id: streamId },
       include: {
-        artist: {
+        user: {
           select: {
             id: true,
             username: true,
             displayName: true,
-            profileImage: true,
-            tier: true,
+            avatar: true,
+            role: true,
           },
         },
       },
@@ -94,19 +94,19 @@ app.get('/api/streams/:streamId', async (req, res) => {
 // Start a stream
 app.post('/api/streams/start', async (req, res) => {
   try {
-    const { artistId, title, category, thumbnailUrl } = req.body;
+    const { userId, title, description, thumbnail } = req.body;
     
-    if (!artistId || !title) {
+    if (!userId || !title) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'artistId and title are required' })
+        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'userId and title are required' })
       );
     }
     
-    // Check if artist already has an active stream
+    // Check if user already has an active stream
     const existingStream = await prisma.stream.findFirst({
       where: { 
-        artistId,
-        isLive: true,
+        userId,
+        status: 'LIVE',
       },
     });
     
@@ -116,23 +116,26 @@ app.post('/api/streams/start', async (req, res) => {
       );
     }
     
+    // Generate a unique stream key
+    const streamKey = `stream_${userId}_${Date.now()}`;
+    
     const stream = await prisma.stream.create({
       data: {
-        artistId,
+        userId,
         title,
-        category: category || 'MUSIC',
-        thumbnailUrl: thumbnailUrl || null,
-        isLive: true,
-        viewerCount: 0,
+        description: description || null,
+        thumbnail: thumbnail || null,
+        streamKey,
+        status: 'LIVE',
         startedAt: new Date(),
       },
       include: {
-        artist: {
+        user: {
           select: {
             id: true,
             username: true,
             displayName: true,
-            profileImage: true,
+            avatar: true,
           },
         },
       },
@@ -165,7 +168,7 @@ app.post('/api/streams/:streamId/end', async (req, res) => {
     const updatedStream = await prisma.stream.update({
       where: { id: streamId },
       data: {
-        isLive: false,
+        status: 'ENDED',
         endedAt: new Date(),
       },
     });
@@ -183,17 +186,17 @@ app.post('/api/streams/:streamId/end', async (req, res) => {
 app.patch('/api/streams/:streamId/viewers', async (req, res) => {
   try {
     const { streamId } = req.params;
-    const { viewerCount } = req.body;
+    const { viewCount } = req.body;
     
-    if (typeof viewerCount !== 'number') {
+    if (typeof viewCount !== 'number') {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'viewerCount must be a number' })
+        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'viewCount must be a number' })
       );
     }
     
     const stream = await prisma.stream.update({
       where: { id: streamId },
-      data: { viewerCount },
+      data: { viewCount },
     });
     
     res.json(successResponse(stream));
@@ -205,16 +208,16 @@ app.patch('/api/streams/:streamId/viewers', async (req, res) => {
   }
 });
 
-// Get stream history for artist
-app.get('/api/streams/artist/:artistId/history', async (req, res) => {
+// Get stream history for user
+app.get('/api/streams/user/:userId/history', async (req, res) => {
   try {
-    const { artistId } = req.params;
+    const { userId } = req.params;
     const { limit = '10' } = req.query;
     
     const streams = await prisma.stream.findMany({
       where: { 
-        artistId,
-        isLive: false,
+        userId,
+        status: { in: ['ENDED', 'ARCHIVED'] },
       },
       orderBy: { startedAt: 'desc' },
       take: parseInt(limit as string),
