@@ -66,43 +66,44 @@ app.post('/api/premium/generate/artwork', async (req, res) => {
 // Generate promotional content
 app.post('/api/premium/generate/promo', async (req, res) => {
   try {
-    const { artistId, trackId, type } = req.body;
+    const { userId, videoId, type } = req.body;
     
-    if (!artistId || !trackId || !type) {
+    if (!userId || !videoId || !type) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'artistId, trackId, and type are required' })
+        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'userId, videoId, and type are required' })
       );
     }
     
-    const track = await prisma.track.findUnique({
-      where: { id: trackId },
-      include: { artist: true },
+    const video = await prisma.video.findUnique({
+      where: { id: videoId },
+      include: { user: true },
     });
     
-    if (!track) {
+    if (!video) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(
-        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Track not found' })
+        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Video not found' })
       );
     }
     
     // Generate promo content based on type
     let content = '';
+    const userName = video.user.displayName || video.user.username;
     switch (type) {
       case 'social_post':
-        content = `🎵 New track alert! "${track.title}" by ${track.artist.displayName} is now live! Check it out on MHC Streaming 🔥`;
+        content = `🎵 New video alert! "${video.title}" by ${userName} is now live! Check it out on MHC Streaming 🔥`;
         break;
       case 'email':
-        content = `Hey fans! ${track.artist.displayName} just dropped a new track: "${track.title}". Stream it now!`;
+        content = `Hey fans! ${userName} just dropped a new video: "${video.title}". Stream it now!`;
         break;
       case 'press_release':
-        content = `${track.artist.displayName} releases new single "${track.title}" - Available now on MHC Streaming platform.`;
+        content = `${userName} releases new video "${video.title}" - Available now on MHC Streaming platform.`;
         break;
       default:
-        content = `Check out "${track.title}" by ${track.artist.displayName}!`;
+        content = `Check out "${video.title}" by ${userName}!`;
     }
     
     res.json(successResponse({
-      trackId,
+      videoId,
       type,
       content,
       generatedAt: new Date().toISOString(),
@@ -115,33 +116,34 @@ app.post('/api/premium/generate/promo', async (req, res) => {
   }
 });
 
-// Generate track description using AI
+// Generate video description using AI
 app.post('/api/premium/generate/description', async (req, res) => {
   try {
-    const { trackId, keywords } = req.body;
+    const { videoId, keywords } = req.body;
     
-    if (!trackId) {
+    if (!videoId) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'trackId is required' })
+        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'videoId is required' })
       );
     }
     
-    const track = await prisma.track.findUnique({
-      where: { id: trackId },
-      include: { artist: true },
+    const video = await prisma.video.findUnique({
+      where: { id: videoId },
+      include: { user: true },
     });
     
-    if (!track) {
+    if (!video) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(
-        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Track not found' })
+        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Video not found' })
       );
     }
     
+    const userName = video.user.displayName || video.user.username;
     // Mock AI-generated description
-    const description = `"${track.title}" is a ${track.genre.toLowerCase()} track by ${track.artist.displayName} that showcases their unique sound and artistic vision. ${keywords ? `Featuring elements of ${keywords.join(', ')}.` : ''}`;
+    const description = `"${video.title}" is a video by ${userName} that showcases their unique creative vision. ${keywords ? `Featuring elements of ${keywords.join(', ')}.` : ''}`;
     
     res.json(successResponse({
-      trackId,
+      videoId,
       description,
       generatedAt: new Date().toISOString(),
     }));
