@@ -69,7 +69,7 @@ app.get('/api/analytics/user/:userId', async (req, res) => {
       select: { viewerCount: true },
     });
     
-    const totalViews = streams.reduce((sum: number, stream) => sum + (stream.viewerCount || 0), 0);
+    const totalViews = streams.reduce((sum: number, stream: { viewerCount: number | null }) => sum + (stream.viewerCount || 0), 0);
     
     // Get track count
     const trackCount = await prisma.track.count({
