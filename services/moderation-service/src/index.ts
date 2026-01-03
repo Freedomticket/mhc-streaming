@@ -87,8 +87,8 @@ app.post('/api/moderation/action', async (req, res) => {
     }
     
     // Perform moderation action
-    if (action === 'REMOVE' && contentType === 'TRACK') {
-      await prisma.track.update({
+    if (action === 'REMOVE' && contentType === 'VIDEO') {
+      await prisma.video.update({
         where: { id: contentId },
         data: { status: 'REMOVED' },
       });
