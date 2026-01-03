@@ -29,38 +29,31 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Get personalized track recommendations
-app.get('/api/ai/recommendations/tracks', async (req, res) => {
+// Get personalized video recommendations
+app.get('/api/ai/recommendations/videos', async (req, res) => {
   try {
     const { userId, limit = '10' } = req.query;
     
-    // Simple recommendation algorithm: most played tracks by genre
-    const userLikes = userId ? await prisma.like.findMany({
-      where: { userId: userId as string },
-      include: { track: true },
-      take: 5,
-    }) : [];
-    
-    // Get popular tracks (fallback or mix with personalized)
-    const popularTracks = await prisma.track.findMany({
-      where: { status: 'PUBLISHED' },
-      orderBy: { plays: 'desc' },
+    // Get popular videos (simplified - no Like model exists)
+    const popularVideos = await prisma.video.findMany({
+      where: { status: 'READY' },
+      orderBy: { viewCount: 'desc' },
       take: parseInt(limit as string),
       include: {
-        artist: {
+        user: {
           select: {
             id: true,
             username: true,
             displayName: true,
-            profileImage: true,
+            avatar: true,
           },
         },
       },
     });
     
     res.json(successResponse({
-      tracks: popularTracks,
-      algorithm: userId ? 'personalized' : 'popular',
+      videos: popularVideos,
+      algorithm: 'popular',
     }));
   } catch (error) {
     console.error('Get recommendations error:', error);
@@ -70,23 +63,22 @@ app.get('/api/ai/recommendations/tracks', async (req, res) => {
   }
 });
 
-// Get artist recommendations
-app.get('/api/ai/recommendations/artists', async (req, res) => {
+// Get creator recommendations
+app.get('/api/ai/recommendations/creators', async (req, res) => {
   try {
     const { userId, limit = '10' } = req.query;
     
-    // Simple algorithm: popular artists by follower count
-    const popularArtists = await prisma.user.findMany({
+    // Simple algorithm: popular creators by follower count
+    const popularCreators = await prisma.user.findMany({
       where: { 
-        role: 'ARTIST',
-        tier: { not: 'FREE' },
+        role: 'CREATOR',
       },
       take: parseInt(limit as string),
       include: {
         _count: {
           select: {
             followers: true,
-            tracks: true,
+            videos: true,
           },
         },
       },
@@ -98,7 +90,7 @@ app.get('/api/ai/recommendations/artists', async (req, res) => {
     });
     
     res.json(successResponse({
-      artists: popularArtists,
+      creators: popularCreators,
       algorithm: 'popular',
     }));
   } catch (error) {
@@ -109,47 +101,46 @@ app.get('/api/ai/recommendations/artists', async (req, res) => {
   }
 });
 
-// Get similar tracks
-app.get('/api/ai/similar/tracks/:trackId', async (req, res) => {
+// Get similar videos
+app.get('/api/ai/similar/videos/:videoId', async (req, res) => {
   try {
-    const { trackId } = req.params;
+    const { videoId } = req.params;
     const { limit = '5' } = req.query;
     
-    const track = await prisma.track.findUnique({
-      where: { id: trackId },
+    const video = await prisma.video.findUnique({
+      where: { id: videoId },
     });
     
-    if (!track) {
+    if (!video) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(
-        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Track not found' })
+        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Video not found' })
       );
     }
     
-    // Simple similarity: same genre, different artist
-    const similarTracks = await prisma.track.findMany({
+    // Simple similarity: same artist or related content
+    const similarVideos = await prisma.video.findMany({
       where: {
         AND: [
-          { genre: track.genre },
-          { artistId: { not: track.artistId } },
-          { id: { not: trackId } },
-          { status: 'PUBLISHED' },
+          { userId: { not: video.userId } },
+          { id: { not: videoId } },
+          { status: 'READY' },
         ],
       },
       take: parseInt(limit as string),
-      orderBy: { plays: 'desc' },
+      orderBy: { viewCount: 'desc' },
       include: {
-        artist: {
+        user: {
           select: {
             id: true,
             username: true,
             displayName: true,
-            profileImage: true,
+            avatar: true,
           },
         },
       },
     });
     
-    res.json(successResponse(similarTracks));
+    res.json(successResponse(similarVideos));
   } catch (error) {
     console.error('Get similar tracks error:', error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
@@ -158,23 +149,23 @@ app.get('/api/ai/similar/tracks/:trackId', async (req, res) => {
   }
 });
 
-// Auto-tag track (genre detection, mood, etc.)
+// Auto-tag video (category detection, mood, etc.)
 app.post('/api/ai/auto-tag', async (req, res) => {
   try {
-    const { trackId } = req.body;
+    const { videoId } = req.body;
     
-    if (!trackId) {
+    if (!videoId) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'trackId is required' })
+        errorResponse({ code: ERROR_CODES.INVALID_INPUT, message: 'videoId is required' })
       );
     }
     
     // Placeholder for ML model inference
-    // In production, would analyze audio features
+    // In production, would analyze video/audio features
     const suggestedTags = {
-      genre: 'HIPHOP',
+      category: 'music',
       mood: 'energetic',
-      tempo: 'fast',
+      style: 'modern',
       confidence: 0.85,
     };
     
