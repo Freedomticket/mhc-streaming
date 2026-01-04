@@ -60,20 +60,20 @@ app.get('/api/analytics/user/:userId', async (req, res) => {
     
     // Get user's stream count
     const streamCount = await prisma.stream.count({
-      where: { artistId: userId },
+      where: { userId },
     });
     
-    // Get total views (sum of viewer counts from all streams)
+    // Get total views (sum of view counts from all streams)
     const streams = await prisma.stream.findMany({
-      where: { artistId: userId },
-      select: { viewerCount: true },
+      where: { userId },
+      select: { viewCount: true },
     });
     
-    const totalViews = streams.reduce((sum: number, stream: { viewerCount: number | null }) => sum + (stream.viewerCount || 0), 0);
+    const totalViews = streams.reduce((sum: number, stream: { viewCount: number }) => sum + (stream.viewCount || 0), 0);
     
-    // Get track count
-    const trackCount = await prisma.track.count({
-      where: { artistId: userId },
+    // Get video count
+    const videoCount = await prisma.video.count({
+      where: { userId },
     });
     
     // Get follower count
@@ -86,7 +86,7 @@ app.get('/api/analytics/user/:userId', async (req, res) => {
       metrics: {
         streamCount,
         totalViews,
-        trackCount,
+        videoCount,
         followerCount,
       },
       period: {
@@ -102,35 +102,29 @@ app.get('/api/analytics/user/:userId', async (req, res) => {
   }
 });
 
-// Get track analytics
-app.get('/api/analytics/track/:trackId', async (req, res) => {
+// Get video analytics
+app.get('/api/analytics/video/:videoId', async (req, res) => {
   try {
-    const { trackId } = req.params;
+    const { videoId } = req.params;
     
-    const track = await prisma.track.findUnique({
-      where: { id: trackId },
-      include: {
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
-      },
+    const video = await prisma.video.findUnique({
+      where: { id: videoId },
     });
     
-    if (!track) {
+    if (!video) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(
-        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Track not found' })
+        errorResponse({ code: ERROR_CODES.NOT_FOUND, message: 'Video not found' })
       );
     }
     
     res.json(successResponse({
-      trackId,
-      title: track.title,
+      videoId,
+      title: video.title,
       metrics: {
-        plays: track.plays || 0,
-        likes: track._count.likes,
-        createdAt: track.createdAt,
+        viewCount: video.viewCount || 0,
+        likeCount: video.likeCount || 0,
+        streamCount: video.streamCount || 0,
+        createdAt: video.createdAt,
       },
     }));
   } catch (error) {
@@ -141,21 +135,21 @@ app.get('/api/analytics/track/:trackId', async (req, res) => {
   }
 });
 
-// Increment track play count
-app.post('/api/analytics/track/:trackId/play', async (req, res) => {
+// Increment video view count
+app.post('/api/analytics/video/:videoId/view', async (req, res) => {
   try {
-    const { trackId } = req.params;
+    const { videoId } = req.params;
     
-    const track = await prisma.track.update({
-      where: { id: trackId },
+    const video = await prisma.video.update({
+      where: { id: videoId },
       data: {
-        plays: {
+        viewCount: {
           increment: 1,
         },
       },
     });
     
-    res.json(successResponse({ trackId, plays: track.plays }));
+    res.json(successResponse({ videoId, viewCount: video.viewCount }));
   } catch (error) {
     console.error('Increment play count error:', error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
@@ -168,16 +162,16 @@ app.post('/api/analytics/track/:trackId/play', async (req, res) => {
 app.get('/api/analytics/platform', async (req, res) => {
   try {
     const totalUsers = await prisma.user.count();
-    const totalTracks = await prisma.track.count();
+    const totalVideos = await prisma.video.count();
     const totalStreams = await prisma.stream.count();
     const activeStreams = await prisma.stream.count({
-      where: { isLive: true },
+      where: { status: 'LIVE' },
     });
     
     res.json(successResponse({
       platform: {
         totalUsers,
-        totalTracks,
+        totalVideos,
         totalStreams,
         activeStreams,
       },
@@ -191,39 +185,35 @@ app.get('/api/analytics/platform', async (req, res) => {
   }
 });
 
-// Get trending tracks
-app.get('/api/analytics/trending/tracks', async (req, res) => {
+// Get trending videos
+app.get('/api/analytics/trending/videos', async (req, res) => {
   try {
     const { limit = '10' } = req.query;
     
-    const tracks = await prisma.track.findMany({
+    const videos = await prisma.video.findMany({
+      where: { status: 'READY' },
       orderBy: [
-        { plays: 'desc' },
+        { viewCount: 'desc' },
         { createdAt: 'desc' },
       ],
       take: parseInt(limit as string),
       include: {
-        artist: {
+        user: {
           select: {
             id: true,
             username: true,
             displayName: true,
-            profileImage: true,
-          },
-        },
-        _count: {
-          select: {
-            likes: true,
+            avatar: true,
           },
         },
       },
     });
     
-    res.json(successResponse(tracks));
+    res.json(successResponse(videos));
   } catch (error) {
-    console.error('Get trending tracks error:', error);
+    console.error('Get trending videos error:', error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
-      errorResponse({ code: ERROR_CODES.INTERNAL_ERROR, message: 'Failed to fetch trending tracks' })
+      errorResponse({ code: ERROR_CODES.INTERNAL_ERROR, message: 'Failed to fetch trending videos' })
     );
   }
 });
