@@ -88,9 +88,10 @@ app.post('/api/moderation/action', async (req, res) => {
     
     // Perform moderation action
     if (action === 'REMOVE' && contentType === 'VIDEO') {
+      // Mark as FAILED to hide from public view
       await prisma.video.update({
         where: { id: contentId },
-        data: { status: 'REMOVED' },
+        data: { status: 'FAILED' },
       });
     }
     
