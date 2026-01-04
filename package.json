@@ -17,6 +17,7 @@
     "services/ai-service",
     "services/pod",
     "services/premium-gen",
+    "services/admin-service",
     "packages/*"
   ],
   "scripts": {
