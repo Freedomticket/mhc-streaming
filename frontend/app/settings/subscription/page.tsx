@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { api } from '@/src/lib/api'
 
 const SUBSCRIPTION_TIERS = [
   {
@@ -66,6 +67,8 @@ export default function SubscriptionPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [currentTier, setCurrentTier] = useState('FREE')
+  const [busyTier, setBusyTier] = useState<string | null>(null)
+  const [serverError, setServerError] = useState('')
 
   useEffect(() => {
     const cachedUser = localStorage.getItem('user')
@@ -83,6 +86,50 @@ export default function SubscriptionPage() {
         <div className="animate-pulse text-purgatorio-mist text-xl">Loading...</div>
       </div>
     )
+  }
+
+  const handleSubscribe = async (tier: string) => {
+    if (!user) { router.push('/login'); return }
+    setServerError('')
+    setBusyTier(tier)
+    try {
+      const { data } = await api.post('/api/payments/subscribe', { userId: user.id, tier })
+      const url = data?.data?.url
+      const subscription = data?.data?.subscription
+      if (url) {
+        // Stripe enabled → redirect to Checkout
+        window.location.href = url
+        return
+      }
+      if (subscription) {
+        // Dev mode → DB updated directly
+        const updated = { ...user, subscription: { ...(user.subscription||{}), tier } }
+        localStorage.setItem('user', JSON.stringify(updated))
+        setUser(updated)
+        setCurrentTier(tier)
+      }
+    } catch (e: any) {
+      setServerError(e?.response?.data?.message || e?.response?.data?.error?.message || 'Subscription failed')
+    } finally {
+      setBusyTier(null)
+    }
+  }
+
+  const handleCancel = async () => {
+    if (!user) { router.push('/login'); return }
+    setServerError('')
+    setBusyTier('CANCEL')
+    try {
+      await api.post('/api/payments/cancel', { userId: user.id })
+      const updated = { ...user, subscription: { ...(user.subscription||{}), tier: 'FREE' } }
+      localStorage.setItem('user', JSON.stringify(updated))
+      setUser(updated)
+      setCurrentTier('FREE')
+    } catch (e: any) {
+      setServerError(e?.response?.data?.message || e?.response?.data?.error?.message || 'Cancel failed')
+    } finally {
+      setBusyTier(null)
+    }
   }
 
   if (!user) {
@@ -142,12 +189,19 @@ export default function SubscriptionPage() {
                 </div>
               </div>
               {currentTier !== 'FREE' && (
-                <button className="btn-secondary-inferno">
-                  Cancel Subscription
+                <button onClick={handleCancel} className="btn-secondary-inferno" disabled={busyTier==='CANCEL'}>
+                  {busyTier==='CANCEL' ? 'Cancelling...' : 'Cancel Subscription'}
                 </button>
               )}
             </div>
           </div>
+
+          {/* Errors */}
+          {serverError && (
+            <div className="mb-4 bg-red-900/40 border border-red-600 text-red-200 px-4 py-3 rounded-lg">
+              {serverError}
+            </div>
+          )}
 
           {/* Subscription Tiers Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -198,6 +252,10 @@ export default function SubscriptionPage() {
                       Current Plan
                     </button>
                   ) : isUpgrade ? (
+                    <button className="w-full btn-inferno" onClick={() => handleSubscribe(tier.tier)} disabled={busyTier===tier.tier}>
+                      {busyTier===tier.tier ? 'Processing...' : `Upgrade to ${tier.name}`}
+                    </button>
+                  ) : (
                     <button className="w-full btn-inferno">
                       Upgrade to {tier.name}
                     </button>
