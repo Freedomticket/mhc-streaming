@@ -55,12 +55,12 @@ router.get('/', async (req: Request, res: Response) => {
         transactionCount,
         averageTransaction: avgTransaction._avg.amount || 0
       },
-      byType: revenueByType.map(r => ({
+      byType: revenueByType.map((r: any) => ({
         type: r.type,
         revenue: r._sum.amount || 0,
         count: r._count
       })),
-      byStatus: revenueByStatus.map(r => ({
+      byStatus: revenueByStatus.map((r: any) => ({
         status: r.status,
         revenue: r._sum.amount || 0,
         count: r._count
@@ -106,7 +106,7 @@ router.get('/breakdown', async (req: Request, res: Response) => {
     });
 
     // Get user details
-    const userIds = creatorsRevenue.map(r => r.userId);
+    const userIds = creatorsRevenue.map((r: any) => r.userId);
     const users = await prisma.user.findMany({
       where: { id: { in: userIds } },
       select: {
@@ -117,9 +117,9 @@ router.get('/breakdown', async (req: Request, res: Response) => {
       }
     });
 
-    const userMap = new Map(users.map(u => [u.id, u]));
+    const userMap = new Map(users.map((u: any) => [u.id, u]));
 
-    const breakdown = creatorsRevenue.map(r => ({
+    const breakdown = creatorsRevenue.map((r: any) => ({
       user: userMap.get(r.userId),
       revenue: r._sum.amount || 0,
       transactionCount: r._count
@@ -127,7 +127,7 @@ router.get('/breakdown', async (req: Request, res: Response) => {
 
     const total = await prisma.payment.groupBy({
       by: ['userId']
-    }).then(res => res.length);
+    }).then((res: any) => res.length);
 
     return res.status(HTTP_STATUS.OK).json(
       successResponse({ 
