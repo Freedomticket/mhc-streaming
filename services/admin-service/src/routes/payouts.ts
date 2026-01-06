@@ -25,8 +25,8 @@ router.get('/', async (req: Request, res: Response) => {
     const [payouts, total] = await Promise.all([
       prisma.royaltyPayout.findMany({
         where: {
-          status: status as any,
-          ...(userId ? { artist: { user: { id: userId as string } } } : {})
+          status: status as any
+          // Note: Artist is not linked to User in schema; omit userId filter
         },
         skip,
         take: limitNum,
