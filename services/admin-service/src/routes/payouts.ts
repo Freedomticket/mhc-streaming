@@ -21,43 +21,38 @@ router.get('/', async (req: Request, res: Response) => {
     const limitNum = parseInt(limit as string, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    // Build where clause
-    const where: any = { type: 'PAYOUT' };
-    
-    if (status) {
-      where.status = status;
-    }
-
-    if (userId) {
-      where.userId = userId;
-    }
-
-    // Get payouts
+    // Get payouts from RoyaltyPayout table
     const [payouts, total] = await Promise.all([
-      prisma.payment.findMany({
-        where,
+      prisma.royaltyPayout.findMany({
+        where: {
+          status: status as any,
+          ...(userId ? { artist: { user: { id: userId as string } } } : {})
+        },
         skip,
         take: limitNum,
         orderBy: { createdAt: 'desc' },
         select: {
           id: true,
-          userId: true,
           amount: true,
           currency: true,
           status: true,
+          paymentMethod: true,
+          paymentEmail: true,
+          transactionId: true,
+          scheduledFor: true,
+          processedAt: true,
           metadata: true,
           createdAt: true,
-          user: {
+          artist: {
             select: {
               id: true,
-              username: true,
-              email: true,
-              role: true
+              name: true,
+              slug: true
             }
           }
         }
       }),
-      prisma.payment.count({ where })
+      prisma.royaltyPayout.count({ where: { status: status as any } })
     ]);
 
     return res.status(HTTP_STATUS.OK).json(
@@ -94,10 +89,7 @@ router.post('/:id/approve', async (req: Request, res: Response) => {
     const { notes } = req.body;
 
     // Check if payout exists
-    const payout = await prisma.payment.findUnique({ 
-      where: { id },
-      include: { user: true }
-    });
+    const payout = await prisma.royaltyPayout.findUnique({ where: { id } });
 
     if (!payout) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(
@@ -105,14 +97,6 @@ router.post('/:id/approve', async (req: Request, res: Response) => {
       );
     }
 
-    if (payout.type !== 'PAYOUT') {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json(
-        errorResponse({ 
-          code: ERROR_CODES.VALIDATION_ERROR, 
-          message: 'Payment is not a payout request' 
-        })
-      );
-    }
 
     if (payout.status !== 'PENDING') {
       return res.status(HTTP_STATUS.BAD_REQUEST).json(
@@ -124,12 +108,13 @@ router.post('/:id/approve', async (req: Request, res: Response) => {
     }
 
     // Update payout status to COMPLETED
-    const updatedPayout = await prisma.payment.update({
+    const updatedPayout = await prisma.royaltyPayout.update({
       where: { id },
       data: { 
         status: 'COMPLETED',
+        processedAt: new Date(),
         metadata: {
-          ...(payout.metadata as any || {}),
+          ...(payout?.metadata as any || {}),
           approvedBy: req.user?.userId,
           approvedAt: new Date().toISOString(),
           adminNotes: notes
@@ -137,7 +122,7 @@ router.post('/:id/approve', async (req: Request, res: Response) => {
       }
     });
 
-    console.log(`Admin ${req.user?.userId} approved payout ${id} for user ${payout.userId}`);
+    console.log(`Admin ${req.user?.userId} approved payout ${id}`);
 
     return res.status(HTTP_STATUS.OK).json(
       successResponse({ 
@@ -176,7 +161,7 @@ router.post('/:id/reject', async (req: Request, res: Response) => {
       );
     }
 
-    const payout = await prisma.payment.findUnique({ where: { id } });
+    const payout = await prisma.royaltyPayout.findUnique({ where: { id } });
 
     if (!payout) {
       return res.status(HTTP_STATUS.NOT_FOUND).json(
@@ -194,12 +179,13 @@ router.post('/:id/reject', async (req: Request, res: Response) => {
     }
 
     // Update payout status to FAILED (rejected)
-    const updatedPayout = await prisma.payment.update({
+    const updatedPayout = await prisma.royaltyPayout.update({
       where: { id },
       data: { 
         status: 'FAILED',
+        processedAt: new Date(),
         metadata: {
-          ...(payout.metadata as any || {}),
+          ...(payout?.metadata as any || {}),
           rejectedBy: req.user?.userId,
           rejectedAt: new Date().toISOString(),
           rejectionReason: reason

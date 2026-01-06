@@ -17,6 +17,7 @@ const MEDIA_SERVICE_URL = process.env.MEDIA_SERVICE_URL || 'http://localhost:300
 const STREAM_SERVICE_URL = process.env.STREAM_SERVICE_URL || 'http://localhost:3003';
 const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost:3004';
 const ANALYTICS_SERVICE_URL = process.env.ANALYTICS_SERVICE_URL || 'http://localhost:3005';
+const ADMIN_SERVICE_URL = process.env.ADMIN_SERVICE_URL || 'http://localhost:3012';
 
 // Middleware
 app.use(helmet());
@@ -139,6 +140,24 @@ app.use(
         error: {
           code: 'SERVICE_UNAVAILABLE',
           message: 'Analytics service is currently unavailable',
+        },
+      });
+    },
+  })
+);
+
+app.use(
+  '/api/admin',
+  createProxyMiddleware({
+    target: ADMIN_SERVICE_URL,
+    changeOrigin: true,
+    onError: (err, req, res) => {
+      console.error('Admin service proxy error:', err);
+      res.status(503).json({
+        success: false,
+        error: {
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Admin service is currently unavailable',
         },
       });
     },

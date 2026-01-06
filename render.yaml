@@ -65,6 +65,8 @@ services:
         value: https://mhc-stream-service.onrender.com
       - key: ANALYTICS_SERVICE_URL
         value: https://mhc-analytics-service.onrender.com
+      - key: ADMIN_SERVICE_URL
+        value: https://mhc-admin-service.onrender.com
       - key: ALLOWED_ORIGINS
         value: https://mhc-streaming.onrender.com,http://localhost:3000
 

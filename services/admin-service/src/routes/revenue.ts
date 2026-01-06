@@ -33,14 +33,6 @@ router.get('/', async (req: Request, res: Response) => {
       })
     ]);
 
-    // Revenue by payment type
-    const revenueByType = await prisma.payment.groupBy({
-      by: ['type'],
-      where,
-      _sum: { amount: true },
-      _count: true
-    });
-
     // Revenue by status
     const revenueByStatus = await prisma.payment.groupBy({
       by: ['status'],
@@ -55,11 +47,6 @@ router.get('/', async (req: Request, res: Response) => {
         transactionCount,
         averageTransaction: avgTransaction._avg.amount || 0
       },
-      byType: revenueByType.map((r: any) => ({
-        type: r.type,
-        revenue: r._sum.amount || 0,
-        count: r._count
-      })),
       byStatus: revenueByStatus.map((r: any) => ({
         status: r.status,
         revenue: r._sum.amount || 0,

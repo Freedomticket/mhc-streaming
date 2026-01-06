@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { api } from '@/src/lib/api'
+import VerificationBadge, { VerificationStatus } from '@/components/VerificationBadge'
+import UploadLimitIndicator from '@/components/UploadLimitIndicator'
 
 interface DashboardData {
   user: {
@@ -31,6 +33,12 @@ export default function DashboardPage() {
   const router = useRouter()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  
+  // Mock data for demonstration - backend will provide these
+  const [verificationStatus] = useState<VerificationStatus>('unverified')
+  const [uploadsThisWeek] = useState(1)
+  const [uploadLimit] = useState(3)
 
   useEffect(() => {
     fetchDashboard()
@@ -42,6 +50,7 @@ export default function DashboardPage() {
       const cachedUser = localStorage.getItem('user')
       if (cachedUser) {
         const user = JSON.parse(cachedUser)
+        setIsAdmin(user.role === 'ADMIN')
         const dashboardData: DashboardData = {
           user: {
             id: user.id || '1',
@@ -65,6 +74,7 @@ export default function DashboardPage() {
 
       // Fallback to API call
       const { data: userData } = await api.get('/api/auth/me')
+      setIsAdmin(userData.data.role === 'ADMIN')
       const dashboardData: DashboardData = {
         user: {
           id: userData.data.id,
@@ -133,6 +143,11 @@ export default function DashboardPage() {
               <Link href="/settings" className="text-purgatorio-mist hover:text-white">
                 Settings
               </Link>
+              {isAdmin && (
+                <Link href="/admin" className="text-yellow-500 hover:text-yellow-400 font-semibold">
+                  Admin
+                </Link>
+              )}
               <Link href="/logout" className="text-red-600 hover:text-red-500">
                 Logout
               </Link>
@@ -145,17 +160,23 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-display font-bold text-white mb-2">
-            Dashboard
-          </h1>
-          <p className="text-purgatorio-mist">
-            Welcome back, @{data.user.username}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-4xl font-display font-bold text-white mb-2">
+                Dashboard
+              </h1>
+              <p className="text-purgatorio-mist">
+                Welcome back, @{data.user.username}
+              </p>
+            </div>
+            <VerificationBadge status={verificationStatus} />
+          </div>
         </div>
 
-        {/* Subscription Badge */}
-        <div className="mb-8">
-          <div className="card-inferno inline-block">
+        {/* Subscription & Verification */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Subscription Badge */}
+          <div className="card-inferno">
             <div className="flex items-center gap-3">
               <span className="text-2xl">
                 {data.user.subscriptionTier === 'PARADISO' && '✨'}
@@ -176,7 +197,45 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Upload Limits */}
+          <UploadLimitIndicator
+            verificationStatus={verificationStatus}
+            uploadsThisWeek={uploadsThisWeek}
+            uploadLimit={uploadLimit}
+            nextResetDate={new Date(Date.now() + 6 * 24 * 60 * 60 * 1000)}
+          />
         </div>
+
+        {/* Verification CTA */}
+        {verificationStatus === 'unverified' && (
+          <div className="mb-8">
+            <div className="card-inferno border-l-4 border-green-600">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-display font-bold text-white mb-2">
+                    ✓ Verify Your Artist Profile
+                  </h3>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Unlock higher upload limits, premium features, and build trust with your audience.
+                  </p>
+                  <ul className="text-sm text-gray-400 space-y-1 mb-4">
+                    <li>• Increase weekly uploads from 3 to 20+</li>
+                    <li>• Get verified artist badge on your profile</li>
+                    <li>• Prioritized in discovery and recommendations</li>
+                    <li>• Access to premium generation tools</li>
+                  </ul>
+                </div>
+                <Link
+                  href="/verify"
+                  className="btn-inferno whitespace-nowrap"
+                >
+                  Start Verification
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
