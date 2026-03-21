@@ -100,7 +100,7 @@ class ApiClient {
             this.failedQueue = [];
 
             // Retry original request
-            const newAccessToken = data.data?.accessToken || data.accessToken;
+            
             originalRequest.headers = originalRequest.headers || {};
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
