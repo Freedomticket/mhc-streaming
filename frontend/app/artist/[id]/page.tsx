@@ -250,6 +250,35 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
   const artist = artistData[params.id]
   const [following, setFollowing] = useState(false)
   const [activeTab, setActiveTab] = useState<'music' | 'about'>('music')
+  const [shareOpen, setShareOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const profileUrl = typeof window !== 'undefined' ? window.location.href : `https://mhcstreaming.com/artist/${params.id}`
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(profileUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
+
+  const shareNative = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: `${artist.name} on MHC Streaming`,
+        text: `${artist.bio} — Listen on MHC Streaming`,
+        url: profileUrl,
+      })
+    } else {
+      setShareOpen(s => !s)
+    }
+  }
+
+  const shareLinks = [
+    { label: 'Twitter / X', url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${artist.name} on MHC Streaming — ${artist.bio}`)}&url=${encodeURIComponent(profileUrl)}` },
+    { label: 'WhatsApp', url: `https://wa.me/?text=${encodeURIComponent(`${artist.name} on MHC Streaming: ${profileUrl}`)}` },
+    { label: 'Facebook', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}` },
+    { label: 'Telegram', url: `https://t.me/share/url?url=${encodeURIComponent(profileUrl)}&text=${encodeURIComponent(`${artist.name} — ${artist.bio}`)}` },
+  ]
 
   if (!artist) {
     return (
@@ -281,6 +310,14 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
         .ap-msg-btn { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; background: transparent; border: 1px solid #1e1e1e; color: #444; cursor: pointer; transition: all .2s; }
         .ap-msg-btn:hover { border-color: #444; color: #888; }
         .ap-genre { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border: 1px solid #1a1a1a; color: #333; }
+        .ap-share-btn { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; background: transparent; border: 1px solid #1e1e1e; color: #444; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+        .ap-share-btn:hover { border-color: #c9a84c44; color: #c9a84c; }
+        .ap-share-dropdown { position: absolute; top: 100%; left: 0; margin-top: 8px; background: #0a0a0a; border: 1px solid #1a1a1a; min-width: 200px; z-index: 50; }
+        .ap-share-option { display: block; width: 100%; padding: 12px 16px; background: transparent; border: none; border-bottom: 1px solid #0f0f0f; color: #555; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; text-align: left; transition: all .2s; text-decoration: none; }
+        .ap-share-option:hover { background: #111; color: #c9a84c; }
+        .ap-copy-btn { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; background: transparent; border: 1px solid #1e1e1e; color: #444; cursor: pointer; transition: all .2s; }
+        .ap-copy-btn:hover { border-color: #c9a84c44; color: #c9a84c; }
+        .ap-copy-btn.copied { border-color: #4caf5044; color: #4caf50; }
       `}</style>
 
       {/* Hero */}
@@ -339,7 +376,7 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
               </div>
 
               {/* Actions */}
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <button
                   className="ap-follow-btn"
                   onClick={() => setFollowing(f => !f)}
@@ -357,6 +394,49 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                     {l.label}
                   </a>
                 ))}
+
+                {/* Copy Link */}
+                <button
+                  className={`ap-copy-btn ${copied ? 'copied' : ''}`}
+                  onClick={copyLink}
+                >
+                  {copied ? '✓ Copied' : 'Copy Link'}
+                </button>
+
+                {/* Share button with dropdown */}
+                <div style={{ position: 'relative' }}>
+                  <button className="ap-share-btn" onClick={shareNative}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    Share
+                  </button>
+                  {shareOpen && (
+                    <div className="ap-share-dropdown">
+                      {shareLinks.map(s => (
+                        <a
+                          key={s.label}
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ap-share-option"
+                          onClick={() => setShareOpen(false)}
+                        >
+                          {s.label}
+                        </a>
+                      ))}
+                      <button
+                        className="ap-share-option"
+                        onClick={() => { copyLink(); setShareOpen(false) }}
+                        style={{ width: '100%' }}
+                      >
+                        Copy Link
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

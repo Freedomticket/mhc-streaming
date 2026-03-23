@@ -316,7 +316,7 @@ export default function ArtistsPage() {
                   </div>
 
                   {/* Buttons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px' }} onClick={e => e.preventDefault()}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px' }} onClick={e => e.stopPropagation()}>
                     <button className={`art-btn-follow art-btn-${artist.realm}`}>Follow</button>
                     <button className="art-btn-msg">✉</button>
                   </div>
