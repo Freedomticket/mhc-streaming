@@ -40,6 +40,7 @@ const artistData: Record<string, {
     ]
   },
   '2': {
+
     name: 'Rising Soul',
     title: 'Singer-Songwriter',
     realm: 'purgatorio',
@@ -57,8 +58,8 @@ const artistData: Record<string, {
       { title: 'Penance Road', duration: '5:01', streams: '87K' },
     ],
     socialLinks: [
-      { label: 'Spotify', url: '#' },
-      { label: 'Instagram', url: '#' },
+      { label: 'Bandcamp', url: '#' },
+      { label: 'SoundCloud', url: '#' },
     ]
   },
   '3': {
@@ -79,8 +80,8 @@ const artistData: Record<string, {
       { title: 'Rose of Heaven', duration: '4:33', streams: '198K' },
     ],
     socialLinks: [
-      { label: 'Website', url: '#' },
-      { label: 'YouTube', url: '#' },
+      { label: 'Bandcamp', url: '#' },
+      { label: 'SoundCloud', url: '#' },
     ]
   },
   '4': {
@@ -102,6 +103,7 @@ const artistData: Record<string, {
     ],
     socialLinks: [
       { label: 'Bandcamp', url: '#' },
+      { label: 'SoundCloud', url: '#' },
     ]
   },
   '5': {
@@ -122,6 +124,7 @@ const artistData: Record<string, {
       { title: 'Smoke Ritual', duration: '6:08', streams: '54K' },
     ],
     socialLinks: [
+      { label: 'Bandcamp', url: '#' },
       { label: 'SoundCloud', url: '#' },
     ]
   },
@@ -143,8 +146,8 @@ const artistData: Record<string, {
       { title: 'The Divine Proportion', duration: '5:58', streams: '198K' },
     ],
     socialLinks: [
-      { label: 'Mixcloud', url: '#' },
-      { label: 'Instagram', url: '#' },
+      { label: 'Bandcamp', url: '#' },
+      { label: 'SoundCloud', url: '#' },
     ]
   },
 }
