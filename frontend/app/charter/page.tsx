@@ -83,16 +83,32 @@ Financial practices shall not exploit artists, audiences, or stewards. No econom
   },
   {
     number: 'Article XI',
+    title: 'Sovereign Sound Vault Publishing LLC',
+    content: `MHC Streaming operates Sovereign Sound Vault Publishing LLC — an artist-first publishing administration company built to return money and power to creators.
+
+WHAT WE DO: When an artist opts in, Sovereign Sound Vault Publishing LLC will register their songs with their Performing Rights Organization (ASCAP, BMI, or SESAC), pitch their music for sync licensing opportunities — TV, film, commercials, video games, and more — collect and distribute performance and sync royalties directly to the artist, and advocate for their music in spaces most independent artists never reach.
+
+THE DEAL: Sovereign Sound Vault Publishing LLC operates on a 15% administration fee. Artists keep 85% of all royalties generated — including sync fees, performance royalties, and mechanical royalties. Artists retain 100% ownership of their masters and their writer's share. We never take ownership of your music.
+
+We only earn when you earn. That is the MHC way.
+
+HOW TO OPT IN: Artists may submit individual tracks to Sovereign Sound Vault Publishing LLC at the time of upload. There is no blanket deal. Each track may be opted in or out independently, at any time.
+
+WHY WE BUILT THIS: Most independent artists leave thousands of dollars uncollected every year because they do not have access to publishing administration. Labels and major publishers gatekeep this process and take the lion's share. Sovereign Sound Vault Publishing LLC gives every artist on MHC Streaming — from day one — the same infrastructure major label artists have. The only difference is you keep what is yours.`,
+    badge: '⚡ New 2026 — Sovereign Sound Vault Publishing LLC'
+  },
+  {
+    number: 'Article XII',
     title: 'Succession',
     content: `Leadership and stewardship shall never be hereditary, permanent, or absolute. Succession shall be governed by competence, integrity, and adherence to this Charter. Any steward who violates this Charter forfeits authority.`
   },
   {
-    number: 'Article XII',
+    number: 'Article XIII',
     title: 'Amendment',
     content: `This Charter may be amended only through documented review, multi-party agreement, and preservation of core principles. Amendments shall not weaken lawful operation, artistic sovereignty, anti-corruption safeguards, or human oversight.`
   },
   {
-    number: 'Article XIII',
+    number: 'Article XIV',
     title: 'Final Provision',
     content: `This Charter exists not to claim truth, but to protect it. If MHC Streaming survives beyond its founders, it shall do so because this Charter restrained power when restraint was difficult. If this Charter is ever abandoned, the platform shall be considered compromised, regardless of size or success.`
   },
@@ -118,6 +134,8 @@ export default function CharterPage() {
         .ch-ai-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border: 1px solid #c9a84c44; color: #c9a84c; margin-top: 8px; }
         .ch-back { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #333; text-decoration: none; transition: color .2s; display: inline-block; margin-bottom: 48px; }
         .ch-back:hover { color: #c9a84c; }
+        .ch-sovereign { background: linear-gradient(135deg, #0a0800 0%, #1a1200 100%); border: 1px solid #c9a84c33; border-radius: 4px; padding: 24px; margin-top: 16px; }
+        .ch-sovereign-stat { text-align: center; padding: 12px; background: #000; border-radius: 4px; }
       `}</style>
 
       <div style={{ maxWidth: '780px', margin: '0 auto', padding: '64px 32px 120px' }}>
@@ -164,8 +182,34 @@ export default function CharterPage() {
               {article.number === 'Article X' && (
                 <div className="ch-ai-badge">⚡ Updated 2026 — Royalty Reporting Infrastructure</div>
               )}
+              {article.badge && (
+                <div className="ch-ai-badge">{article.badge}</div>
+              )}
               {activeArticle === article.number && (
-                <p className="ch-article-content">{article.content}</p>
+                <>
+                  <p className="ch-article-content">{article.content}</p>
+                  {article.number === 'Article XI' && (
+                    <div className="ch-sovereign">
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                        <div className="ch-sovereign-stat">
+                          <div className="ch-cinzel" style={{ fontSize: '28px', color: '#c9a84c', fontWeight: 700 }}>85%</div>
+                          <div className="ch-cinzel" style={{ fontSize: '7px', letterSpacing: '2px', color: '#555', marginTop: '4px' }}>Artist Keeps</div>
+                        </div>
+                        <div className="ch-sovereign-stat">
+                          <div className="ch-cinzel" style={{ fontSize: '28px', color: '#c9a84c', fontWeight: 700 }}>15%</div>
+                          <div className="ch-cinzel" style={{ fontSize: '7px', letterSpacing: '2px', color: '#555', marginTop: '4px' }}>Admin Fee</div>
+                        </div>
+                        <div className="ch-sovereign-stat">
+                          <div className="ch-cinzel" style={{ fontSize: '28px', color: '#c9a84c', fontWeight: 700 }}>100%</div>
+                          <div className="ch-cinzel" style={{ fontSize: '7px', letterSpacing: '2px', color: '#555', marginTop: '4px' }}>You Own It</div>
+                        </div>
+                      </div>
+                      <p className="ch-garamond" style={{ fontSize: '13px', color: '#444', fontStyle: 'italic', textAlign: 'center' }}>
+                        Human-sparked. Sovereign-protected.
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           ))}
