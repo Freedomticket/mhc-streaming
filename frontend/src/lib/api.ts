@@ -92,15 +92,14 @@ class ApiClient {
               { refreshToken: refreshToken }
             );
 
-            this.saveTokens(data.data?.accessToken || data.accessToken, refreshToken);
+            const newAccessToken = data.data?.accessToken || data.accessToken;
+            this.saveTokens(newAccessToken, refreshToken);
 
             // Retry failed requests
-            const newAccessToken = data.data?.accessToken || data.accessToken;
             this.failedQueue.forEach(({ resolve }) => resolve(newAccessToken));
             this.failedQueue = [];
 
             // Retry original request
-            
             originalRequest.headers = originalRequest.headers || {};
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
@@ -242,7 +241,7 @@ class ApiClient {
 }
 
 // Initialize API client
-const apiBaseUrl = typeof window !== 'undefined' 
+const apiBaseUrl = typeof window !== 'undefined'
   ? process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
   : 'http://localhost:3000';
 
