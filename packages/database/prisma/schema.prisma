@@ -96,6 +96,10 @@ model User {
   labelManagedBy String?  // userId of the label/manager account
   isLabelAccount Boolean  @default(false) // true = this user manages other artists
 
+  // Founding artist — permanent 50% discount on all paid plans, forever
+  isFounder      Boolean  @default(false)
+  founderRealm   String?  // 'inferno' | 'paradiso' — chosen at application
+
   // Social auth
   googleId  String? @unique
   twitterId String? @unique
@@ -828,6 +832,36 @@ model IsrcRegistry {
   registeredAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// ── Founder Applications ──────────────────────────────────────────────────────
+// 30 founding artist slots. Approved founders get permanent 50% discount.
+
+model FounderApplication {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  artistName  String
+  email       String   @unique
+  genre       String
+  links       String?
+  why         String   @db.Text
+  realm       String   // 'inferno' | 'paradiso'
+
+  // Status
+  status      String   @default("pending") // pending | approved | rejected
+  reviewedAt  DateTime?
+  reviewedBy  String?  // admin userId
+
+  // If approved + user signs up, link them
+  userId      String?  @unique
+
+  appliedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([realm])
+  @@index([appliedAt])
 }
 
 // ── Track ─────────────────────────────────────────────────────────────────────

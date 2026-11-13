@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
 import authRoutes from './routes/auth';
+import foundersRoutes from './routes/founders';
 import { errorHandler } from './middleware/errorHandler';
 
 // Load .env from service directory
@@ -34,6 +35,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/founders', foundersRoutes);
 
 // Error handler
 app.use(errorHandler);
