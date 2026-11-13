@@ -96,9 +96,11 @@ model User {
   labelManagedBy String?  // userId of the label/manager account
   isLabelAccount Boolean  @default(false) // true = this user manages other artists
 
+  // Dante realm — every artist picks their world at signup, can change anytime
+  realm          String?  // 'inferno' | 'paradiso'
+
   // Founding artist — permanent 50% discount on all paid plans, forever
   isFounder      Boolean  @default(false)
-  founderRealm   String?  // 'inferno' | 'paradiso' — chosen at application
 
   // Social auth
   googleId  String? @unique

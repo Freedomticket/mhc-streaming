@@ -55,16 +55,36 @@ router.post('/register', strictAuthLimiter, async (req, res) => {
       );
     }
     
+    // Validate realm if provided
+    const realm = req.body.realm;
+    if (realm && !['inferno', 'paradiso'].includes(realm)) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json(
+        errorResponse({
+          code: ERROR_CODES.VALIDATION_ERROR,
+          message: 'Invalid realm. Must be inferno or paradiso.',
+        })
+      );
+    }
+
     // Hash password
     const passwordHash = await hashPassword(validatedData.password);
-    
-    // Create user
+
+    // Check if this email has an approved founder application — apply discount
+    const founderApp = await prisma.founderApplication.findUnique({
+      where: { email: validatedData.email.toLowerCase() },
+      select: { status: true, realm: true },
+    });
+    const isFounder = founderApp?.status === 'approved';
+
+    // Create user — realm from signup form, fallback to founder application realm
     const user = await prisma.user.create({
       data: {
         email: validatedData.email,
         username: validatedData.username,
         displayName: validatedData.displayName || validatedData.username,
         passwordHash,
+        realm: realm || (isFounder ? founderApp!.realm : null),
+        isFounder,
         subscription: {
           create: {
             tier: 'FREE',
@@ -79,6 +99,8 @@ router.post('/register', strictAuthLimiter, async (req, res) => {
         displayName: true,
         avatar: true,
         role: true,
+        realm: true,
+        isFounder: true,
         createdAt: true,
       },
     });
@@ -263,6 +285,8 @@ router.get('/me', generalLimiter, async (req, res) => {
         avatar: true,
         bio: true,
         role: true,
+        realm: true,
+        isFounder: true,
         createdAt: true,
         subscription: {
           select: {
@@ -290,6 +314,40 @@ router.get('/me', generalLimiter, async (req, res) => {
         code: ERROR_CODES.INVALID_TOKEN,
         message: 'Invalid or expired token',
       })
+    );
+  }
+});
+
+// Update realm — artists can switch between Inferno and Paradiso anytime
+router.patch('/realm', generalLimiter, async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json(
+        errorResponse({ code: ERROR_CODES.UNAUTHORIZED, message: 'No token provided' })
+      );
+    }
+
+    const payload = verifyAccessToken(authHeader.substring(7));
+    const { realm } = req.body;
+
+    if (!realm || !['inferno', 'paradiso'].includes(realm)) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json(
+        errorResponse({ code: ERROR_CODES.VALIDATION_ERROR, message: 'realm must be inferno or paradiso' })
+      );
+    }
+
+    const user = await prisma.user.update({
+      where: { id: payload.userId },
+      data: { realm },
+      select: { id: true, realm: true, displayName: true },
+    });
+
+    res.json(successResponse({ user, message: `Realm updated to ${realm}` }));
+  } catch (error) {
+    console.error('Realm update error:', error);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      errorResponse({ code: ERROR_CODES.INTERNAL_ERROR, message: 'Failed to update realm' })
     );
   }
 });

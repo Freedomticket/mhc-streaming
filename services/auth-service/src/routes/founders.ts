@@ -268,7 +268,7 @@ router.post('/:id/approve', requireAuth, async (req: Request, res: Response) => 
         where: { id: application.userId },
         data: {
           isFounder: true,
-          founderRealm: application.realm,
+          realm: application.realm,
         },
       });
     }

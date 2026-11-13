@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/src/lib/api'
 
-type SubscriptionTier = 'FREE' | 'INFERNO' | 'PURGATORIO' | 'PARADISO'
+type Realm = 'inferno' | 'paradiso'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -15,24 +15,26 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: '',
   })
-  const [tier, setTier] = useState<SubscriptionTier>('FREE')
+  const [realm, setRealm] = useState<Realm | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
-    // Validation
+    if (!realm) {
+      setError('Please choose your realm before continuing.')
+      document.getElementById('realm-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       return
@@ -50,17 +52,15 @@ export default function RegisterPage() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        realm,
       })
 
-      // Save tokens
       api.saveTokens(data.data.accessToken, data.data.refreshToken)
-      
-      // Save user data
+
       if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(data.data.user))
       }
 
-      // Redirect to dashboard
       router.push('/dashboard')
     } catch (err: any) {
       if (!err.response) {
@@ -68,38 +68,69 @@ export default function RegisterPage() {
       } else if (err.response.status >= 500) {
         setError(`Server error (${err.response.status}). Please try again later.`)
       } else {
-        setError(err.response?.data?.message || err.response?.data?.error?.message || 'Registration failed. Please try again.')
+        setError(
+          err.response?.data?.message ||
+          err.response?.data?.error?.message ||
+          'Registration failed. Please try again.'
+        )
       }
     } finally {
       setLoading(false)
     }
   }
 
-  const tiers = [
-    { name: 'FREE' as SubscriptionTier, price: 'Free', color: 'gray' },
-    { name: 'INFERNO' as SubscriptionTier, price: '$9.99/mo', color: 'red' },
-    { name: 'PURGATORIO' as SubscriptionTier, price: '$19.99/mo', color: 'purgatorio' },
-    { name: 'PARADISO' as SubscriptionTier, price: '$49.99/mo', color: 'yellow' },
-  ]
+  const realmConfig = {
+    inferno: {
+      emoji: '🔥',
+      label: 'Inferno',
+      desc: 'Raw intensity. High contrast, deep reds, shadow. For artists whose art burns, confronts, or refuses to be ignored.',
+      activeClass: 'border-red-600 bg-red-900/20 shadow-[0_0_24px_rgba(192,57,43,0.25)]',
+      inactiveClass: 'border-gray-700 hover:border-red-600/50',
+      labelClass: 'text-red-500',
+      btnClass: 'bg-red-700 hover:bg-red-600 text-white',
+    },
+    paradiso: {
+      emoji: '✨',
+      label: 'Paradiso',
+      desc: 'Luminous and elevated. Gold light, warmth, clarity. For artists who lift, illuminate, or transcend.',
+      activeClass: 'border-yellow-500 bg-yellow-900/20 shadow-[0_0_24px_rgba(201,168,76,0.22)]',
+      inactiveClass: 'border-gray-700 hover:border-yellow-500/50',
+      labelClass: 'text-yellow-400',
+      btnClass: 'bg-yellow-600 hover:bg-yellow-500 text-black',
+    },
+  }
+
+  const submitBtnClass = realm
+    ? realmConfig[realm].btnClass
+    : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-60'
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-inferno-charcoal py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
+
+        {/* Header */}
+        <div className="text-center mb-10">
           <h1 className="text-4xl font-display font-bold mb-2">
             <span className="text-white">MOST HIGH</span>{' '}
             <span className="text-red-600">CREATION</span>
           </h1>
-          <p className="text-purgatorio-mist">Create your account</p>
+          <p className="text-gray-400">Create your artist account</p>
         </div>
 
-        <div className="card-inferno">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-900/50 border border-red-600 text-red-200 px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
+        <form onSubmit={handleSubmit} className="space-y-8">
+
+          {/* Error */}
+          {error && (
+            <div className="bg-red-900/50 border border-red-600 text-red-200 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Credentials card */}
+          <div className="card-inferno space-y-5">
+            <h2 className="text-sm font-semibold tracking-widest uppercase text-gray-400 mb-1">
+              Your Account
+            </h2>
 
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
@@ -113,7 +144,7 @@ export default function RegisterPage() {
                 value={formData.username}
                 onChange={handleChange}
                 className="input-inferno"
-                placeholder="johndoe"
+                placeholder="yourname"
                 disabled={loading}
               />
             </div>
@@ -143,12 +174,12 @@ export default function RegisterPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
                   onChange={handleChange}
                   className="input-inferno pr-10"
-                  placeholder="Min. 12 characters with special character"
+                  placeholder="Min. 12 characters"
                   disabled={loading}
                 />
                 <button
@@ -169,9 +200,7 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Must be at least 12 characters with a special character
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Must be at least 12 characters with a special character</p>
             </div>
 
             <div>
@@ -182,7 +211,7 @@ export default function RegisterPage() {
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -209,62 +238,92 @@ export default function RegisterPage() {
                 </button>
               </div>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">
-                Choose Your Tier
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {tiers.map((t) => (
-                  <button
-                    key={t.name}
-                    type="button"
-                    onClick={() => setTier(t.name)}
-                    className={`
-                      p-4 rounded-lg border-2 transition-all
-                      ${
-                        tier === t.name
-                          ? 'border-red-600 bg-red-900/30'
-                          : 'border-inferno-border hover:border-red-600/50'
-                      }
-                    `}
-                    disabled={loading}
-                  >
-                    <div className="font-display font-bold text-lg">{t.name}</div>
-                    <div className="text-sm text-gray-400">{t.price}</div>
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                You can upgrade or downgrade anytime
+          {/* Realm choice — the centrepiece */}
+          <div id="realm-section">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-display font-bold text-white mb-1">Choose Your Realm</h2>
+              <p className="text-sm text-gray-400">
+                Your realm shapes how your art is presented on MHC.{' '}
+                <span className="text-gray-500">You can change it anytime from your profile.</span>
               </p>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(['inferno', 'paradiso'] as Realm[]).map((r) => {
+                const cfg = realmConfig[r]
+                const isSelected = realm === r
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRealm(r)}
+                    disabled={loading}
+                    className={`
+                      relative text-left p-6 rounded-lg border-2 transition-all duration-200
+                      ${isSelected ? cfg.activeClass : cfg.inactiveClass}
+                    `}
+                  >
+                    {/* Check */}
+                    <span
+                      className={`
+                        absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all
+                        ${isSelected
+                          ? r === 'inferno' ? 'bg-red-600 border-red-600 text-white' : 'bg-yellow-500 border-yellow-500 text-black'
+                          : 'border-gray-600'
+                        }
+                      `}
+                    >
+                      {isSelected && '✓'}
+                    </span>
+
+                    <span className="text-3xl mb-3 block">{cfg.emoji}</span>
+                    <span className={`font-display font-bold text-lg block mb-2 ${cfg.labelClass}`}>
+                      {cfg.label}
+                    </span>
+                    <span className="text-sm text-gray-400 leading-relaxed">{cfg.desc}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {!realm && (
+              <p className="text-center text-xs text-gray-500 mt-3">
+                Choose your realm to unlock the create account button
+              </p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <div>
             <button
               type="submit"
-              disabled={loading}
-              className="w-full btn-inferno disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !realm}
+              className={`w-full py-4 px-6 rounded-lg font-display font-bold text-sm tracking-widest uppercase transition-all duration-200 ${submitBtnClass} disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading
+                ? 'Creating account…'
+                : realm
+                ? `Enter as ${realmConfig[realm].label}`
+                : 'Choose a realm to continue'
+              }
             </button>
 
-            <p className="text-xs text-gray-500 text-center">
+            <p className="text-xs text-gray-500 text-center mt-3">
               By creating an account, you agree to our Terms of Service and Privacy Policy
             </p>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
-              Already have an account?{' '}
-              <Link href="/login" className="text-red-600 hover:text-red-500 font-medium">
-                Sign in
-              </Link>
-            </p>
           </div>
-        </div>
+        </form>
 
-        <div className="mt-8 text-center">
-          <Link href="/" className="text-purgatorio-mist hover:text-white transition-colors">
+        <div className="mt-8 text-center space-y-3">
+          <p className="text-gray-400 text-sm">
+            Already have an account?{' '}
+            <Link href="/login" className="text-red-500 hover:text-red-400 font-medium">
+              Sign in
+            </Link>
+          </p>
+          <Link href="/" className="block text-gray-500 hover:text-gray-300 text-sm transition-colors">
             ← Back to home
           </Link>
         </div>
