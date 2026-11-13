@@ -11,6 +11,9 @@ import { logForensicEvent } from './forensics.service';
 import Bull from 'bull';
 import axios from 'axios';
 
+// AI processing service URL — must be set in production, never localhost
+const AI_PROCESSOR_URL = process.env.AI_PROCESSOR_URL || 'http://localhost:5000';
+
 export interface VideoSegment {
   start: number;
   end: number;
@@ -191,7 +194,7 @@ export class AutoEditorService {
   private async detectScenes(videoUrl: string): Promise<number[]> {
     try {
       // Call ML service or ffprobe for scene detection
-      const response = await axios.post('http://localhost:5000/detect-scenes', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/detect-scenes', {
         videoUrl,
       });
       return response.data.scenes || [];
@@ -209,7 +212,7 @@ export class AutoEditorService {
     bpm: number;
   }> {
     try {
-      const response = await axios.post('http://localhost:5000/detect-beats', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/detect-beats', {
         videoUrl,
       });
       return response.data || { beats: [], bpm: 120 };
@@ -226,7 +229,7 @@ export class AutoEditorService {
     scenes: number[]
   ): Promise<VideoSegment[]> {
     try {
-      const response = await axios.post('http://localhost:5000/trim-silence', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/trim-silence', {
         videoUrl,
         scenes,
       });
@@ -245,7 +248,7 @@ export class AutoEditorService {
     segments: VideoSegment[]
   ): Promise<VideoSegment[]> {
     try {
-      const response = await axios.post('http://localhost:5000/score-highlights', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/score-highlights', {
         videoUrl,
         segments,
       });
@@ -269,7 +272,7 @@ export class AutoEditorService {
     videoUrl: string
   ): Promise<'inferno' | 'purgatorio' | 'paradiso'> {
     try {
-      const response = await axios.post('http://localhost:5000/analyze-aesthetics', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/analyze-aesthetics', {
         videoUrl,
       });
 
@@ -297,7 +300,7 @@ export class AutoEditorService {
     trailer: string;
   }> {
     try {
-      const response = await axios.post('http://localhost:5000/generate-shorts', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/generate-shorts', {
         videoUrl,
         highlights: highlights.map((h) => ({
           start: h.start,
@@ -328,7 +331,7 @@ export class AutoEditorService {
 
     try {
       // Apply filter to each output
-      const filtered = await axios.post('http://localhost:5000/apply-filter', {
+      const filtered = await axios.post(AI_PROCESSOR_URL + '/apply-filter', {
         tiktok: shorts.tiktok,
         instagram: shorts.instagram,
         youtube: shorts.youtube,
@@ -399,7 +402,7 @@ export class AutoEditorService {
     trailer: string;
   }> {
     try {
-      const response = await axios.post('http://localhost:5000/generate-captions', {
+      const response = await axios.post(AI_PROCESSOR_URL + '/generate-captions', {
         tiktok: shorts.tiktokShort,
         instagram: shorts.instagramReel,
         youtube: shorts.youtubeShorts,

@@ -17,7 +17,10 @@ import { logForensicEvent } from './forensics.service';
 import { creditRoyalty } from './royalty.service';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY environment variable must be set');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export interface PatronTier {
   name: string;

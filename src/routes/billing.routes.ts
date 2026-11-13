@@ -20,17 +20,20 @@ import { logForensicEvent } from '../services/forensics.service';
 import { requireAuth } from '../middleware/auth.middleware';
 import express from 'express';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY environment variable must be set');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-02-15' as any,
 });
 
 const router = Router();
 
-// Stripe price IDs from environment
+// Stripe price IDs — must be set in environment, no fake fallbacks
 const STRIPE_PRICES = {
-  fan: process.env.STRIPE_PRICE_FAN || 'price_fan_xxx',
-  pro: process.env.STRIPE_PRICE_PRO || 'price_pro_xxx',
-  studio: process.env.STRIPE_PRICE_STUDIO || 'price_studio_xxx',
+  fan:    process.env.STRIPE_PRICE_FAN    || (() => { throw new Error('STRIPE_PRICE_FAN env var must be set') })(),
+  pro:    process.env.STRIPE_PRICE_PRO    || (() => { throw new Error('STRIPE_PRICE_PRO env var must be set') })(),
+  studio: process.env.STRIPE_PRICE_STUDIO || (() => { throw new Error('STRIPE_PRICE_STUDIO env var must be set') })(),
 };
 
 /**
@@ -256,7 +259,7 @@ router.post(
         event = stripe.webhooks.constructEvent(
           req.body,
           sig,
-          process.env.STRIPE_WEBHOOK_SECRET || ''
+          process.env.STRIPE_WEBHOOK_SECRET || (() => { throw new Error('STRIPE_WEBHOOK_SECRET env var must be set') })()
         );
       } catch (err) {
         return res.status(400).json({

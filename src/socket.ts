@@ -50,7 +50,9 @@ interface TipData {
 export function initSocket(server: HTTPServer) {
   const io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || '*',
+      origin: process.env.FRONTEND_URL
+        ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
+        : ['https://mhc-streaming.onrender.com', 'http://localhost:3000'],
       credentials: true,
     },
     transports: ['websocket', 'polling'],

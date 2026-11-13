@@ -16,11 +16,20 @@
 
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
+import rateLimit from 'express-rate-limit';
 import { videoService } from '../services/video.service';
 import { requireAuth } from '../middleware/auth.middleware';
 import { requireProArtist } from '../middleware/subscription.middleware';
-import { requireRateLimit } from '../middleware/rateLimit.middleware';
 import { logForensicEvent } from '../services/forensics.service';
+
+// Rate limit for public feed — prevents scraping bots
+const feedRateLimit = rateLimit({
+  windowMs: 60 * 1000,       // 1 minute window
+  max: 60,                    // 60 requests/min per IP (1/sec average)
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down.', code: 'RATE_LIMIT_FEED' },
+});
 
 const router = Router();
 
@@ -89,7 +98,7 @@ router.post(
  * TikTok-style infinite feed (algorithm-ranked)
  * Public endpoint, no auth required
  */
-router.get('/feed', async (req: Request, res: Response) => {
+router.get('/feed', feedRateLimit, async (req: Request, res: Response) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     const cursor = req.query.cursor as string;

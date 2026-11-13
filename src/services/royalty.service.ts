@@ -18,7 +18,10 @@ import { logForensicEvent } from './forensics.service';
 import Stripe from 'stripe';
 import crypto from 'crypto';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY environment variable must be set');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export interface RoyaltyRate {
   source: string;
