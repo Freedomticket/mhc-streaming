@@ -25,11 +25,13 @@ import { enforceTrackCodes }         from '@/utils/codeValidator.backend'
 import { checkISRCNotDuplicate, registerISRC } from '@/utils/isrcDuplicateCheck'
 import { logValidationEvent, hashIP } from '@/utils/auditLog'
 import { uploadRateLimit }            from '@/middleware/uploadRateLimit'
+import { checkMonthlyUploadLimit, recordUploadCounted } from '@/middleware/monthlyUploadLimit'
 
 const router = Router()
 
 // POST /api/tracks/upload
-router.post('/upload', uploadRateLimit, async (req, res) => {
+// Gate order: rate limit → monthly cap → format → duplicate → authorship → file
+router.post('/upload', uploadRateLimit, checkMonthlyUploadLimit, async (req, res) => {
   const { userId, hashedIP, recordRejection } = res.locals.mhc
 
   const {
@@ -140,6 +142,9 @@ router.post('/upload', uploadRateLimit, async (req, res) => {
 
   // ── Register the ISRC now that upload succeeded ───────────────────────────
   await registerISRC(isrc, trackId, userId)
+
+  // ── Increment monthly upload count ───────────────────────────────────────
+  await recordUploadCounted(userId)
 
   // ── Log the success ───────────────────────────────────────────────────────
   await logValidationEvent({

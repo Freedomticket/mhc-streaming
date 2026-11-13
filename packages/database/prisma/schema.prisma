@@ -91,6 +91,11 @@ model User {
   role          UserRole @default(USER)
   emailVerified Boolean  @default(false)
 
+  // Label management
+  // If set, this artist is managed by a label account (fee waived, label takes %)
+  labelManagedBy String?  // userId of the label/manager account
+  isLabelAccount Boolean  @default(false) // true = this user manages other artists
+
   // Social auth
   googleId  String? @unique
   twitterId String? @unique
@@ -810,4 +815,36 @@ model RevenueDistribution {
   @@index([calculated])
   @@index([distributed])
   @@index([month])
+}
+
+// ── ISRC Registry ─────────────────────────────────────────────────────────────
+// Each ISRC is permanently locked to one track. Prevents ISRC theft/reuse.
+
+model IsrcRegistry {
+  id           String   @id @default(cuid())
+  isrc         String   @unique  // normalized: XX-XXX-YY-NNNNN
+  trackId      String   @unique  // the MHC track that owns this ISRC
+  userId       String            // the artist who registered it
+  registeredAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ── Track ─────────────────────────────────────────────────────────────────────
+// Core track record. Used for monthly upload count queries.
+
+model Track {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  isrc      String?  @unique
+  iswc      String?
+  fileId    String?  // reference to media-service file
+  status    String   @default("pending") // pending | active | rejected | removed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, createdAt]) // for monthly count queries
+  @@index([status])
 }
