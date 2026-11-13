@@ -1,13 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from '@mhc/common';
-import dotenv from 'dotenv';
-import path from 'path';
 
-// Load .env files before checking environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-if (!process.env.JWT_SECRET) {
-  dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
-}
+// Do NOT call dotenv here — Render injects env vars directly into process.env.
+// dotenv is loaded once in index.ts for local dev only.
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
