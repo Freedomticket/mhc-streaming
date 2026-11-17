@@ -866,6 +866,106 @@ model FounderApplication {
   @@index([appliedAt])
 }
 
+// ── PlayEvent ─────────────────────────────────────────────────────────────────
+// Immutable log of every qualifying play (>30 seconds).
+// ISRC-keyed — works for any content type. Source of truth for all royalties
+// and DDEX exports. Written once, never mutated.
+
+model PlayEvent {
+  id      String @id @default(cuid())
+
+  // What was played (ISRC is the global key)
+  isrc     String          // e.g. US-S1Z-99-00001
+  trackId  String?         // MHC Track.id (optional)
+  videoId  String?         // MHC Video.id (optional)
+  artistId String?         // MHC Artist.id (optional)
+
+  // Who played it
+  userId    String?         // NULL = anonymous
+  ipHash    String?         // SHA-256 of IP — dedup/fraud, never raw IP
+  userAgent String?
+
+  // Quality metrics
+  durationSeconds       Int              // seconds actually listened
+  trackDurationSeconds  Int?             // full track length
+  completionPct         Float?           // durationSeconds / trackDurationSeconds
+  qualified             Boolean @default(true)  // was >30s when written
+
+  // Subscription context
+  subscriptionTier      String?          // FREE | INFERNO | PURGATORIO | PARADISO
+
+  // Fraud detection
+  fraudScore  Float   @default(0.0)     // 0.0 = clean, 1.0 = fraud
+  flagged     Boolean @default(false)
+
+  // Processing state
+  processedAt DateTime?                 // NULL = not yet in a royalty calc
+
+  // Platform metadata
+  platform  String  @default("mhc")    // mhc | api
+  country   String?                    // ISO 3166-1 alpha-2
+
+  playedAt  DateTime @default(now())
+
+  @@index([isrc])
+  @@index([isrc, playedAt])
+  @@index([playedAt])
+  @@index([processedAt])
+  @@index([userId, isrc])
+  @@index([ipHash, isrc])
+  @@index([flagged])
+  @@index([artistId])
+  @@index([artistId, playedAt])
+}
+
+// ── DdexReport ────────────────────────────────────────────────────────────────
+// Manifest for every DDEX/SoundExchange report generated.
+// Tracks: what period, what format, file location, delivery status.
+
+model DdexReport {
+  id String @id @default(cuid())
+
+  // Report identity
+  reportType    String    // DDEX_ERN | SOUNDEXCHANGE | INTERNAL
+  formatVersion String    // ERN/4.1 | SX/2023
+  messageId     String    @unique  // globally unique per DDEX spec
+
+  // Period covered
+  periodStart DateTime
+  periodEnd   DateTime
+
+  // Counts (audit trail)
+  totalPlays     Int @default(0)
+  qualifiedPlays Int @default(0)
+  uniqueIsrcs    Int @default(0)
+  uniqueArtists  Int @default(0)
+
+  // File storage
+  filePath String?   // local path or object storage key
+  fileSize Int?      // bytes
+  checksum String?   // SHA-256
+
+  // Delivery status
+  status          String    @default("generated")
+  // generated | pending_delivery | delivered | acknowledged | failed
+  deliveredAt     DateTime?
+  acknowledgedAt  DateTime?
+  deliveryError   String?
+
+  // Recipient
+  recipient String?  // ASCAP | BMI | SoundExchange | internal
+
+  // Metadata
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reportType])
+  @@index([periodStart])
+  @@index([status])
+}
+
 // ── Track ─────────────────────────────────────────────────────────────────────
 // Core track record. Used for monthly upload count queries.
 
