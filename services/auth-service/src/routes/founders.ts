@@ -241,8 +241,8 @@ router.get('/list', requireAuth, async (req: Request, res: Response) => {
       applications,
       summary: {
         total: applications.length,
-        byStatus: Object.fromEntries(counts.map(c => [c.status, c._count.id])),
-        spotsRemaining: Math.max(0, FOUNDER_LIMIT - applications.filter(a => a.status !== 'rejected').length),
+        byStatus: Object.fromEntries(counts.map((c: { status: string; _count: { id: number } }) => [c.status, c._count.id])),
+        spotsRemaining: Math.max(0, FOUNDER_LIMIT - applications.filter((a: { status: string }) => a.status !== 'rejected').length),
       },
     });
   } catch (error) {
